@@ -19,10 +19,9 @@ def booking():
 def thankyou():
 	return render_template("thankyou.html")
 
-<<<<<<< Updated upstream
 app.run(host="0.0.0.0", port=3000)
 #更新protection rule
-=======
+
 
 @app.route("/api/attractions")
 def search_attraction():
@@ -226,4 +225,3 @@ def get_mrt():
 
 app.run(host="0.0.0.0", port=3000)
 
->>>>>>> Stashed changes
