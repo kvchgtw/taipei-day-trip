@@ -2,6 +2,7 @@ let fetching = false
 let nextPage = 0
 let keyword = ""
 let src = `http://13.112.47.131:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage
+// let observer;
 
 
 function loadMoreData(observer, keyword, nextPage) {
@@ -27,7 +28,7 @@ function loadMoreData(observer, keyword, nextPage) {
     }
 
 
-window.onload = function getData(){
+document.addEventListener("DOMContentLoaded", function(){
     //用fetch連線並取得資料
     fetch("http://13.112.47.131:3000/api/mrts").then(function(response){
         return response.json();
@@ -67,16 +68,7 @@ window.onload = function getData(){
     });
    
 
-  };
-
-
-
-  document.addEventListener("DOMContentLoaded", function() {
-    
-   
-
-
-// 觀察器
+    // 觀察器
     let options = {
         rootMargin:'0px',
         threshold:0.5   // 看到一半的target，就執行callback
@@ -105,20 +97,29 @@ window.onload = function getData(){
     // 將頁面底部元件加入 IntersectionObserver
     observer.observe(bottomElement);
 
+  });
+
+
+
+// document.addEventListener("DOMContentLoaded", function() {
+    
+   
+
+
     //Search Function
 
     //關鍵字搜尋功能
-    let searchForm = document.getElementById("search-form")
-    let searchInput = document.getElementById("search-input")
+    // let searchForm = document.getElementById("search-form")
+    // let searchInput = document.getElementById("search-input")
 
     //用戶點擊捷運站列表
-
-    searchForm.addEventListener("submit", function (event) {
+window.onload = function(){
+    document.getElementById("search-form").addEventListener("submit", function (event) {
         
         event.preventDefault(); // 防止表單提交的默認行為
 
         // 獲取用戶輸入的搜尋關鍵字
-        keyword = searchInput.value.trim();
+        keyword = document.getElementById("search-input").value.trim();
         console.log(keyword)
 
         // 在這裡可以執行搜尋操作，例如發送 AJAX 請求到後端 API
@@ -141,7 +142,7 @@ window.onload = function getData(){
       if (event.target.classList.contains("mrt-list-item-name")){
           let mrtName = event.target.textContent;//把用戶點擊的捷運站名稱存在 mrtName 中
              // 更新搜尋框的內容為被點擊的捷運站名稱
-            searchInput.value = mrtName;
+             document.getElementById("search-input").value = mrtName;
 
             let apiUrl = `http://13.112.47.131:3000/api/attractions?keyword=${(mrtName)}`;
             fetch(apiUrl).then(function(response){
@@ -154,9 +155,10 @@ window.onload = function getData(){
 
         };
     });
-    
 
-}); //這是domcontentload
+};
+
+// }); //這是domcontentload
 
 //生成div函式
 

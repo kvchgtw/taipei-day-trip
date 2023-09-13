@@ -259,6 +259,7 @@ body
     font-family: 'Noto Sans TC';
     line-height: 13.3px;
     color: #666666;
+    cursor: pointer;
   }
 
   .main
