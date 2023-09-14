@@ -2,10 +2,9 @@ let fetching = false
 let nextPage = 0
 let keyword = ""
 let src = `http://13.112.47.131:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage
-// let observer;
 
 
-function loadMoreData(observer, keyword, nextPage) {
+function loadMoreData(keyword, nextPage) {
 
         console.log("loadMoreData fetch:", src)
         fetch(src).then(function (response) {
@@ -15,28 +14,28 @@ function loadMoreData(observer, keyword, nextPage) {
             spotDivGenerator(data, { clearOldData: false });
             
             if (data["nextPage"] !== null) {
-                nextPage = data["nextPage"]
+                nextPage = data["nextPage"] // LoadMoreData 載入當前頁面後，若判斷還有下一頁，就把nextPage資料從 data["nextPage"] 存入到 nextPage 中
                 src =  `http://13.112.47.131:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage
-                console.log("src:",src)
+                console.log("Next src:",src)
             } else {
                 console.log('No more pages to load.');
                 return
             };
 
-            fetching = false;
+            fetching = false
+            console.log('loadMoreData fetching status:', fetching);
+            
         });
     }
 
 
 document.addEventListener("DOMContentLoaded", function(){
-    //用fetch連線並取得資料
     fetch("http://13.112.47.131:3000/api/mrts").then(function(response){
         return response.json();
     }).then(function(data){
         
-        
         let mrt = data["data"] // 從 mrt API 中，取出 "data" 裡面的值
-        
+    
         // 獲取包含生成的<div>的容器元素
         const container = document.getElementById("mrt-list-item");
 
@@ -55,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function(){
            
         const scrollLeft = document.getElementById("arrow-btn-left");
         const scrollRight = document.getElementById("arrow-btn-right");
-
 
         // 設定按鈕點擊事件
         scrollLeft.onclick=function(){
@@ -79,15 +77,14 @@ document.addEventListener("DOMContentLoaded", function(){
         if(fetching===false){  
             fetching = true;
             console.log("footer fetching: ", fetching)
-            loadMoreData(observer, keyword, nextPage);
+            loadMoreData(keyword, nextPage);
 
             }else{
             observer.unobserve(bottomElement);  // 取消觀察目標
+            console.log('取消首頁載入觀察目標')
                 }
         }
     }; 
-
-
     
     let observer = new IntersectionObserver(callback, options)
 
@@ -100,20 +97,9 @@ document.addEventListener("DOMContentLoaded", function(){
   });
 
 
-
-// document.addEventListener("DOMContentLoaded", function() {
-    
-   
-
-
-    //Search Function
-
-    //關鍵字搜尋功能
-    // let searchForm = document.getElementById("search-form")
-    // let searchInput = document.getElementById("search-input")
-
-    //用戶點擊捷運站列表
 window.onload = function(){
+    
+    //Search Function
     document.getElementById("search-form").addEventListener("submit", function (event) {
         
         event.preventDefault(); // 防止表單提交的默認行為
@@ -122,43 +108,105 @@ window.onload = function(){
         keyword = document.getElementById("search-input").value.trim();
         console.log(keyword)
 
-        // 在這裡可以執行搜尋操作，例如發送 AJAX 請求到後端 API
-        // 並處理後端返回的搜尋結果
-        // 組合 API URL，將關鍵字添加到 URL 中
         src = `http://13.112.47.131:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage;
         console.log("search: ",src)
 
         const spotContainer = document.getElementById("content-grid-frame");
         spotContainer.innerHTML = "";
-        loadMoreData(observer, keyword, nextPage);
         
-       
-       
+        if (fetching === true){
+            fetching = false
+        }
+        
+        console.log('search loadMoreData fetching status:', fetching);
+
+    // 觀察器
+    let options = {
+        rootMargin:'0px',
+        threshold:0.5   // 看到一半的target，就執行callback
+         }
+    
+    let callback=(e)=>{ // 觸發條件後要處理的回呼函式
+    if(e[0].isIntersecting){  
+        if(fetching===false){  
+            fetching = true;
+            console.log("footer fetching: ", fetching)
+            loadMoreData(keyword, nextPage);
+
+            }else{
+            observer.unobserve(bottomElement);  // 取消觀察目標
+            console.log('取消搜尋觀察目標')
+                }
+        }
+    }; 
+    
+    let observer = new IntersectionObserver(callback, options)
+
+    // // 宣告頁面底部元件
+    const bottomElement = document.getElementById('footer-text');
+
+    // 將頁面底部元件加入 IntersectionObserver
+    observer.observe(bottomElement);
+
     });
 
     //點擊捷運站，並以捷運站名作為關鍵字去搜尋
     let mrtClickContainer = document.getElementById("mrt-list-item")
     mrtClickContainer.addEventListener("click", function (event){
       if (event.target.classList.contains("mrt-list-item-name")){
-          let mrtName = event.target.textContent;//把用戶點擊的捷運站名稱存在 mrtName 中
+          let keyword = event.target.textContent;//把用戶點擊的捷運站名稱存在 mrtName 中
              // 更新搜尋框的內容為被點擊的捷運站名稱
-             document.getElementById("search-input").value = mrtName;
+             console.log("mrt list keyword click:", keyword)
+             document.getElementById("search-input").value = keyword;
 
-            let apiUrl = `http://13.112.47.131:3000/api/attractions?keyword=${(mrtName)}`;
-            fetch(apiUrl).then(function(response){
-            return response.json();
-            }).then(function(data){
-            
-            spotDivGenerator(data, { clearOldData: true });
+            src = `http://13.112.47.131:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage;
+            console.log("mrt list src:", src)
+      
+        const spotContainer = document.getElementById("content-grid-frame");
+        spotContainer.innerHTML = "";
+        
+        if (fetching === true){
+            fetching = false
+        }
+        
+        console.log('mrt list loadMoreData fetching status:', fetching);
 
-        });
+    // 觀察器
+    let options = {
+        rootMargin:'0px',
+        threshold:0.5   // 看到一半的target，就執行callback
+         }
+    
+    let callback=(e)=>{ // 觸發條件後要處理的回呼函式
+    if(e[0].isIntersecting){  
+        if(fetching===false){  
+            fetching = true;
+            console.log("mrt list footer fetching: ", fetching)
+            loadMoreData(keyword, nextPage);
+            console.log("observer:",observer)
+
+            }
+            else{
+            observer.unobserve(bottomElement);  // 取消觀察目標
+            console.log('取消 mrt list 觀察目標')
+            }
+        }
+    }; 
+    
+    let observer = new IntersectionObserver(callback, options)
+
+    // // 宣告頁面底部元件
+    const bottomElement = document.getElementById('footer-text');
+
+    // 將頁面底部元件加入 IntersectionObserver
+    observer.observe(bottomElement);
 
         };
+        
     });
 
 };
 
-// }); //這是domcontentload
 
 //生成div函式
 
