@@ -1,7 +1,7 @@
 let fetching = false
 let nextPage = 0
 let keyword = ""
-let src = `http://127.0.0.1:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage
+let src = `/api/attractions?keyword=${(keyword)}&page=`+nextPage
 
 
 function loadMoreData(keyword, nextPage) {
@@ -15,7 +15,7 @@ function loadMoreData(keyword, nextPage) {
             
             if (data["nextPage"] !== null) {
                 nextPage = data["nextPage"] // LoadMoreData 載入當前頁面後，若判斷還有下一頁，就把nextPage資料從 data["nextPage"] 存入到 nextPage 中
-                src =  `http://127.0.0.1:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage
+                src =  `/api/attractions?keyword=${(keyword)}&page=`+nextPage
                 console.log("Next src:",src)
             } else {
                 console.log('No more pages to load.');
@@ -30,7 +30,7 @@ function loadMoreData(keyword, nextPage) {
 
 
 document.addEventListener("DOMContentLoaded", function(){
-    fetch("http://127.0.0.1:3000/api/mrts").then(function(response){
+    fetch("/api/mrts").then(function(response){
         return response.json();
     }).then(function(data){
         
@@ -108,7 +108,7 @@ window.onload = function(){
         keyword = document.getElementById("search-input").value.trim();
         console.log(keyword)
 
-        src = `http://127.0.0.1:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage;
+        src = `/api/attractions?keyword=${(keyword)}&page=`+nextPage;
         console.log("search: ",src)
 
         const spotContainer = document.getElementById("content-grid-frame");
@@ -159,7 +159,7 @@ window.onload = function(){
              console.log("mrt list keyword click:", keyword)
              document.getElementById("search-input").value = keyword;
 
-            src = `http://127.0.0.1:3000/api/attractions?keyword=${(keyword)}&page=`+nextPage;
+            src = `/api/attractions?keyword=${(keyword)}&page=`+nextPage;
             console.log("mrt list src:", src)
       
         const spotContainer = document.getElementById("content-grid-frame");
