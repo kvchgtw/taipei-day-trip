@@ -1,0 +1,13 @@
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="12" height="12" fill="white" fill-opacity="0.8"/>
+<g id="button / circle" opacity="0.75" clip-path="url(#clip0_0_1)">
+<g id="circle current">
+<circle id="circle current_2" cx="6" cy="6" r="5.5" fill="black" stroke="white"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="72" height="12" fill="white" transform="translate(-6)"/>
+</clipPath>
+</defs>
+</svg>
