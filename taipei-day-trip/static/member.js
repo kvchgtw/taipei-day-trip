@@ -62,10 +62,11 @@ signUpCloseButton.addEventListener('click', function(){
 
 //切換至註冊頁面
 switchToSignUp.addEventListener('click', function(){
-    signInErrorMsg.innerHTML=""
+    signUpErrorMsg.innerHTML=""
     signUpName.value = ""
     signUpEmail.value = ""
     signUpPassword.value = ""
+    signUpErrorMsg.style.color = ""
     signInDialog.style.display = "none"
     signUpDialog.style.display = "block"
 })
@@ -103,16 +104,12 @@ signInSubmitButton.addEventListener('click', function(){
     .then(data => {
         if (data.token){
             window.localStorage.setItem("token",data.token)
-            localToken = JSON.stringify(window.localStorage.getItem("token"));
-            console.log("登入成功",localToken)
             signInDialog.style.display = "none"
             mask.classList.toggle("mask")
             location.reload();
-    
 
         }else{
             signInErrorMsg.textContent="電子信箱或密碼輸入錯誤"
-            console.log(data.error, data.message)
         }
     })
 
@@ -133,18 +130,9 @@ function checkSignIn(){
         })
     .then(response => response.json())
     .then(data => {
-        console.log("前端 check:", data)
-
-        if (data!== null){
-            
+        if (data!== null){       
             signOut()
-
-
-        
         }
-
-       
-         
     })
 }
 function signOut(){
@@ -162,9 +150,7 @@ function signOut(){
         location.reload();
         signInButton.style.display="flex"
 
-
     })
-    
 
     }
 
@@ -172,12 +158,9 @@ function signOut(){
 
 //用戶點擊註冊按鈕
 signUpSubmitButton.addEventListener('click', function(){
-    console.log("sign up btn clicked") //ok
-    // signUpErrorMsg.innerHTML=""
     Name = signUpName.value
     email = signUpEmail.value
     password = signUpPassword.value
-    console.log(Name, email, password)
 
     if (Name === "" || email === "" || password === ""){
         signUpErrorMsg.textContent="請輸入姓名、電子信箱與密碼"
@@ -210,7 +193,6 @@ signUpSubmitButton.addEventListener('click', function(){
             signUpErrorMsg.textContent="系統錯誤，請稍後再試"
         }
 
-        
         
     })
 
