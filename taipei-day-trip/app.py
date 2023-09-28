@@ -1,5 +1,9 @@
 from flask import *
 import mysql.connector
+import jwt
+from datetime import datetime, timedelta
+
+key = "secret"
 
 app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
@@ -220,6 +224,186 @@ def get_mrt():
 		if con.is_connected():
 			cursor.close()
 			con.close()
+
+
+@app.route("/api/user", methods = ["POST"]) #註冊新會員
+def signup():
+	
+	signup_data = request.get_json()
+
+	name = signup_data["name"]
+	email = signup_data["email"]
+	password = signup_data["password"]
+
+	# name = request.form["name"]
+	# email = request.form["email"]
+	# password = request.form["password"]
+
+
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT email from member_table WHERE email = %s", (email,))
+		existing_user = cursor.fetchone()
+
+		if existing_user:
+			response_error400 = json.dumps({'error': True,'message': '此信箱已被註冊，請使用其他信箱註冊'},ensure_ascii=False)
+			return response_error400, 400 # 定義 http error code 400				
+
+		
+		else:
+			cursor.execute("INSERT INTO member_table (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
+			con.commit() #確定執行
+
+			response_success = json.dumps({'ok': True},ensure_ascii=False)
+			return response_success, 200 # 定義 http code 200
+
+
+			
+
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+
+
+
+@app.route("/api/user/auth")
+
+def auth():
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		print("bearer:", bearer)
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256")
+			print("decode",decoded_token)
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error500 = json.dumps(None, ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+
+	
+
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, name from member_table WHERE id = %s and email = %s and name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+
+		if existing_user and expiredTime > currentTime:
+			response_success = json.dumps({'id': decoded_token['id'], 'name': decoded_token['name'], 'email': decoded_token['email']},ensure_ascii=False)
+		# 若檢查成功，那就要JWT加密然後返回token給前端
+			return response_success, 200 # 定義 http code 200			
+		else:
+			response_error400 = json.dumps(None,ensure_ascii=False)
+			return response_error400, 400 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+			
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+	
+
+
+
+	#把解碼的資料，拿去跟資料庫比對
+	#需要檢查exp是否過期...
+
+#可能是要先拿到前端存的token，然後再解碼，得到ㄓemail & password，然後去資料庫query會員資料，然提供前端id, name, email？
+
+
+@app.route("/api/user/auth", methods = ["PUT"])
+def signin():
+# 先拿到用戶輸入的email, password，然後去資料庫比對。
+	
+	signin_data = request.get_json()
+	# print(signin_data)
+
+	
+	email = signin_data["email"] 
+	# print("email: ", email)
+	#這個接收資料的方式需要設定form上面的功能，當提交表單時，啟動js函式把資料傳給api。
+	# 但 signin_data = request.get_json() # 接收 JSON 資料轉為 dictionary  這樣就不特別設定form參數，直接用js操作拿到value後，變成json傳給api，然後後端在把json變成字典。
+	# signin_data 裡面自然會有定義好的email, password
+	password = signin_data["password"]
+	# print("password: ", password)
+
+
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, password, name from member_table WHERE email = %s and password = %s", (email, password))
+		existing_user = cursor.fetchone()
+
+
+		if existing_user:
+			user_data = {
+				"id": existing_user[0],
+				"email": existing_user[1],
+				"name": existing_user[3],
+				 "exp": datetime.utcnow() + timedelta(days=7)
+				
+			}
+			token = jwt.encode(user_data, key, algorithm="HS256")
+			response_success = json.dumps({'token': token},ensure_ascii=False)
+			# 若檢查成功，那就要JWT加密然後返回token給前端
+			return response_success, 200 # 定義 http code 200				
+
+		
+		else:
+			response_error400 = json.dumps({'error': True,'message': '信箱或密碼輸入錯誤'},ensure_ascii=False)
+			return response_error400, 400 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+
+	
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+
+# 比對成功，就給為期7天的token
+# 比對失敗，報錯400 or 500
 
 
 app.run(host="0.0.0.0", port=3000)
