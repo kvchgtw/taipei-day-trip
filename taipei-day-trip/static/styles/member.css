@@ -146,6 +146,8 @@ font-weight: 500;
 line-height: 13.3px; /* 83.125% */
 
 }
+
+
 .sign-up-input-name{
     margin: 15px 0px 0px 15px;
     width: 293px;
@@ -158,7 +160,10 @@ line-height: 13.3px; /* 83.125% */
     font-weight: 500;
     line-height: 13.3px; /* 83.125% */
     
-    }
+}
+
+
+
 
 .sign-up-input-password{
     margin: 10px 0px 0px 15px;
@@ -172,7 +177,9 @@ line-height: 13.3px; /* 83.125% */
     font-weight: 500;
     line-height: 13.3px; /* 83.125% */
     
-    }
+}
+
+
 
 .error-msg{
 color:  rgb(217,48,37);

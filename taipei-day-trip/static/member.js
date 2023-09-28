@@ -37,14 +37,17 @@ let localToken =""
 
 let navBarItem = document.getElementById("nav-bar-item")
 
-
+//點擊按鈕打開登入視窗
 signInButton.addEventListener('click', function(){
     mask.classList.toggle("mask")
+    signInEmail.value = ""
+    signInPassword.value = ""
     signInDialog.style.display = "block"
     console.log("sign in event")
 
 })
 
+//點擊Close關閉視窗
 signInCloseButton.addEventListener('click', function(){
         signInErrorMsg.innerHTML=""
         signInDialog.style.display = "none"
@@ -57,15 +60,21 @@ signUpCloseButton.addEventListener('click', function(){
     mask.classList.toggle("mask")
 })
 
-
+//切換至註冊頁面
 switchToSignUp.addEventListener('click', function(){
     signInErrorMsg.innerHTML=""
+    signUpName.value = ""
+    signUpEmail.value = ""
+    signUpPassword.value = ""
     signInDialog.style.display = "none"
     signUpDialog.style.display = "block"
 })
 
+//切換至登入頁面
 switchToSignIn.addEventListener('click', function(){
     signInErrorMsg.innerHTML=""
+    signInEmail.value = ""
+    signInPassword.value = ""
     signInDialog.style.display = "block"
     signUpDialog.style.display = "none"
 })
@@ -112,6 +121,7 @@ signInSubmitButton.addEventListener('click', function(){
 
 })
 
+//檢查登入狀態
 window.onload = function(){
     checkSignIn()
 }
@@ -147,7 +157,7 @@ function signOut(){
 
     signout.addEventListener('click', function(){
         // signout.style.display="none" // 這會在還沒reload前，就關閉了
-        signout.innerHTML="",2000
+        signout.innerHTML=""
         localStorage.clear();
         location.reload();
         signInButton.style.display="flex"
@@ -169,9 +179,9 @@ signUpSubmitButton.addEventListener('click', function(){
     password = signUpPassword.value
     console.log(Name, email, password)
 
-    if (Name == "" || email === "" || password === ""){
+    if (Name === "" || email === "" || password === ""){
         signUpErrorMsg.textContent="請輸入姓名、電子信箱與密碼"
-        console.log('有資料是空的')
+        
     }else if(!emailPattern.test(email)){
         signUpErrorMsg.textContent="請輸入有效的電子信箱"
     }
@@ -189,6 +199,7 @@ signUpSubmitButton.addEventListener('click', function(){
         console.log("sign up fetch result:", data.error, data.ok)
         if (data.ok){
             console.log("註冊成功")
+            signUpErrorMsg.style.color = "rgb(3, 166, 109)"
             signUpErrorMsg.textContent="註冊成功！"
         }else if(data.error === true){
             console.log("註冊失敗")
@@ -208,10 +219,4 @@ signUpSubmitButton.addEventListener('click', function(){
 
 })
     
-//登入錯誤的報錯展示 ok
-//登入成功後，視窗要關掉，然後首頁狀態要改變 ok
-//登出的時候要把token刪掉 ok
-//註冊功能 ok
-//error msg css ok
-//attraction page 導入 ok
-//現在不能按enter登入
+
