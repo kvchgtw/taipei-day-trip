@@ -35,7 +35,6 @@ fetch(src).then(function (response) {
     let name = data.data.name
     let category = data.data.category
     let mrt = data.data.mrt
-    console.log(name)
 
 
     let container = document.getElementById("desc-container")
@@ -55,8 +54,7 @@ fetch(src).then(function (response) {
     transportDiv.classList.add("descDiv")
     addressTitle.classList.add("desc-title")
     transportTitle.classList.add("desc-title")
-    // spotNameContainer.classList.add("spotName")
-    // categoryMrtContainer.classList.add("category-mrt")
+
     
     descDiv.textContent = desc
     addressDiv.textContent = address
@@ -76,32 +74,17 @@ fetch(src).then(function (response) {
 
 
     let photoDisplay = document.getElementById("photo-display")
-    // let photoFrameDiv = document.createElement("div")
     
 
     for (let i=0; i < images.length; i++){
         let imageData = images[i]
-        // let imageImg = document.createElement("img")
-        // imageImg.classList.add("image")
-        // imageImg.src = imageData
         
-        // // photoFrameDiv.appendChild(imageImg)
-        // photoDisplay.appendChild(imageImg)
         imagesUrl.push(imageData)
 
     }
-    // console.log(imagesUrl)//得到景點的圖片連結陣列
     showImages()
 
     
-    // let image = document.createElement("img");
-    // image.src = spotData["images"][0];
-
-    // image.classList.add("content-image");
-
-
-    // image.src = spotData["images"][0];
-    // imageDiv.appendChild(image);
 
 })
 
@@ -165,26 +148,13 @@ function nextSlide(){
 }
 
 
-// prevButton.addEventListener("click", prevSlide());
-// nextButton.addEventListener("click", nextSlide());
-// 圖片輪播
 
 
 
 // 設定按鈕點擊事件
 prevButton.onclick=function(){
     prevSlide()
-    console.log("pressed prev")
 };
 nextButton.onclick=function(){
     nextSlide()
-    console.log("pressed next")
-
 };
-// 從1開始，max = image.length
-// prev/next 就是-1 or +1
-// if index <= 1, 不能再減1; if index >= max, 無法再加1
-// 圓點
-// 圓點數量 = image.length
-// 當前展示的圖片的圓點, slideIndex 是1，那就是第一個圓點為當前圖片圓點，slideIndex = pointIndex
-// 
