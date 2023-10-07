@@ -51,7 +51,6 @@ function initSignIn(){
     signInEmail.value = ""
     signInPassword.value = ""
     signInDialog.style.display = "block"
-    console.log("sign in event")
 }
 
 //點擊Close關閉視窗
@@ -162,6 +161,8 @@ function checkSignIn(config={}){
             username = data.name
         }else if (data == null && location.pathname == '/booking'){
             location.href = "/"
+            
+            
         }
     })
     }
