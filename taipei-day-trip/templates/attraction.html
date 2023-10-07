@@ -56,7 +56,7 @@
         
             <div class="item" id="nav-bar-item"> 
                 <!-- 這裡的figma line height = 13.3, 但是設定後整體高度跟figma不一致。 -->
-                <div class="nav-button">
+                <div class="nav-button" id="booking-entry-button">
                     預定行程
                 </div>
                 <div class="nav-button" id="sign-in-button">
@@ -66,9 +66,11 @@
     
         </div>
     </div>
-    <div class="navbar-space">
+    <div class="navbar-space"> </div>
+            <hr class="nav-separator">
+       
 
-    </div>
+   
         <div class="photo-order-container" id="photo-order-container">
             <div class="photo-slide" id="photo-slide">
                 <span class="arrow-btn-left" id="arrow-btn-left"></span>
@@ -96,7 +98,7 @@
 
                         <div class="order-date-title">
                         <label>選擇日期：
-                            <input type="date" class="date-input" id="trip-date" name="trip-start" value="YYYY-MM-DD" min="2023-09-01" max="2024-09-15" />
+                            <input type="date" class="date-input" id="trip-date" name="trip-start"  min="2023-09-01" max="2024-09-15" required />
                         </label>
                         </div>
 
@@ -105,20 +107,18 @@
                             
                                     <input type="radio" id="select-time-morning" name="select-time" value="morning" checked />
                                     <label for="select-time-morning" class="radio-text">上半天</label>
-                                    <input type="radio" id="select-time-afternoon" name="select-time" value="afternonn" />
+                                    <input type="radio" id="select-time-afternoon" name="select-time" value="afternoon" />
                                     <label for="select-time-afternoon" class="radio-text">下半天</label>
                             </label>
                         
                             <div class="order-title" id="price-title">
                                 導覽費用：
-                                <span class="price" id="price">
-                                    新台幣 2000 元
-                                </span>
+                                <span class="price">新台幣</span> <span class="price" id="price">2000</span><span class="price"> 元</span>
                             </div>
 
                             
                             <div>
-                                <button type="submit" class="booking-button">開始預約行程</button>
+                                <button type="submit" class="booking-button" id="start-booking-button">開始預約行程</button>
                             </div>
                             
 
@@ -145,6 +145,7 @@
 
     <script src="{{url_for('static', filename='attraction.js')}}"></script>
     <script src="{{url_for('static', filename='member.js')}}"></script>
+    <script src="{{url_for('static', filename='booking.js')}}"></script>
 
 </body>
 </html>

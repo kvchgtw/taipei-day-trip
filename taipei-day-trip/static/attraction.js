@@ -1,3 +1,7 @@
+
+//新增預定行程功能
+let addBookingButton = document.getElementById("start-booking-button")
+
 //圖片輪播
 let imagesUrl = []
 let currentIndex = 0
@@ -9,9 +13,9 @@ let radioBtnMornig = document.getElementById("select-time-morning")
 let selectTime = document.getElementById("select-time")
 selectTime.addEventListener("click", function(event){
     if (radioBtnMornig.checked == true){
-        price.innerHTML="新台幣 2000 元"
+        price.innerHTML="2000"
     }else{
-        price.innerHTML="新台幣 2500 元"
+        price.innerHTML="2500"
     }
 
 })
@@ -83,7 +87,6 @@ fetch(src).then(function (response) {
 
     }
     showImages()
-
     
 
 })
@@ -157,4 +160,36 @@ prevButton.onclick=function(){
 };
 nextButton.onclick=function(){
     nextSlide()
+
 };
+
+// 新增預定行程
+addBookingButton.addEventListener('click', function(){
+    let selectDate = document.getElementById("trip-date").value
+    console.log(selectDate)
+    if (selectDate == ""){
+        alert("請選擇日期")
+    }else{ 
+        console.log(selectDate)
+
+    let selectTime = document.querySelector('input[name="select-time"]:checked').value
+    console.log(selectTime)
+    let selectPrice = document.getElementById("price").textContent
+    console.log(selectPrice)
+    priceInt = parseInt(selectPrice)
+    let attractionId = id
+
+    let bookingData = {"attractionId": attractionId, "date": selectDate, "time": selectTime, "price": priceInt}
+
+    fetch(apiBookingUrl, {
+        method: 'POST',
+        headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token"), 'Content-Type': 'application/json'},
+        body: JSON.stringify(bookingData)
+        })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+        location.href = "/booking"
+    })
+    }
+})

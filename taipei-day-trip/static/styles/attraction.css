@@ -510,6 +510,16 @@ input::-webkit-calendar-picker-indicator{
     display: flex;
     justify-content: center;
 }
+.nav-separator{
+  border-style: none;
+  background-color: #E8E8E8;
+  height: 1px;
+  width: 100%;
+  position: fixed;
+  z-index: 9999;
+  top: 46px;
+  }
+  
 
 .desc-flex-container{
 display: flex;

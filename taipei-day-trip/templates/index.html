@@ -39,22 +39,24 @@
             <div class="error-msg" id="sign-up-error-msg"></div>
             <div class="switch-to-sign-up" id="switch-to-sign-in">已經有帳戶了？點此登入</div>
         </div>
-</div>
-
+    </div>
 </div>    
+
     <div class="navbar">
 
         <div class="navbar-box">
 
-        <div class="nav-homepage">
+            <div class="nav-homepage">
+            <a href = "/" class="link" >
             <div class="nav-homepage-title">
                 台北一日遊
             </div>
-        </div>
+             </a>
+            </div>
         
             <div class="item" id="nav-bar-item"> 
                 <!-- 這裡的figma line height = 13.3, 但是設定後整體高度跟figma不一致。 -->
-                <div class="nav-button">
+                <div class="nav-button" id="booking-entry-button">
                     預定行程
                 </div>
                 <div class="nav-button" id="sign-in-button">
@@ -64,12 +66,9 @@
 
         </div>
     </div>
-    <div class="navbar-space">
-
-    </div>
+    <div class="navbar-space"></div>
+    
         <div class="cover">
-
-        
             <div class="cover-photo">
                 <div class="cover-photo-items">
                     <div class="cover-photo-title">
@@ -114,22 +113,22 @@
 
     <div class="homepage-content-frame" id="homepage-content-frame">
 
-        <div class="content-grid-frame" id="content-grid-frame">
-        </div>
+        <div class="content-grid-frame" id="content-grid-frame"></div>
     </div>
 
             
     </div>
-    <div class="bottom-space">
+    <div class="bottom-space"></div>
 
-    </div>
     <div class="footer" id="bottom-element">
     <span class="footer-text" id="footer-text">
     COPYRIGHT © 2023 台北一日遊
     </span>
     </div>
-<script src="{{url_for('static', filename='index.js')}}"></script>
-<script src="{{url_for('static', filename='member.js')}}"></script>
+    
+    <script src="{{url_for('static', filename='index.js')}}"></script>
+    <script src="{{url_for('static', filename='member.js')}}"></script>
+    <script src="{{url_for('static', filename='booking.js')}}"></script>
 
 </body>
 </html>

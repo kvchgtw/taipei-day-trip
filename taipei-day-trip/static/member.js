@@ -37,6 +37,10 @@ let localToken =""
 
 let navBarItem = document.getElementById("nav-bar-item")
 
+//取得用戶姓名
+let username = ""
+
+
 //點擊按鈕打開登入視窗
 signInButton.addEventListener('click', function(){
     mask.classList.toggle("mask")
@@ -106,8 +110,13 @@ signInSubmitButton.addEventListener('click', function(){
             window.localStorage.setItem("token",data.token)
             signInDialog.style.display = "none"
             mask.classList.toggle("mask")
-            location.reload();
-
+            if (bookingSignInEvent!==0){
+                location.href = "/booking"
+                bookingSignInEvent = 0
+            }else{
+                location.reload();
+            }
+            
         }else{
             signInErrorMsg.textContent="電子信箱或密碼輸入錯誤"
         }
@@ -121,6 +130,7 @@ signInSubmitButton.addEventListener('click', function(){
 //檢查登入狀態
 window.onload = function(){
     checkSignIn()
+    console.log("頁面載入時，檢查登入態")
 }
 
 function checkSignIn(){
@@ -132,9 +142,13 @@ function checkSignIn(){
     .then(data => {
         if (data!== null){       
             signOut()
+            username = data.name
+            console.log("memeber username:", username)
         }
     })
 }
+
+//登出功能
 function signOut(){
     signInButton.style.display="none"
     let signout = document.createElement("div")
@@ -144,11 +158,20 @@ function signOut(){
     navBarItem.appendChild(signout)
 
     signout.addEventListener('click', function(){
-        // signout.style.display="none" // 這會在還沒reload前，就關閉了
         signout.innerHTML=""
         localStorage.clear();
-        location.reload();
         signInButton.style.display="flex"
+        let currentUrl = location.pathname
+        console.log("currentUrl: ",currentUrl)
+        let bookingUrl = "/booking"
+        if (currentUrl == bookingUrl){
+            location.href = "/"
+        }else{
+            location.reload();
+
+        }
+        
+
 
     })
 
