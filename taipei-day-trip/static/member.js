@@ -160,6 +160,8 @@ function checkSignIn(config={}){
         if (data!== null){       
             signOut()
             username = data.name
+        }else if (data == null && location.pathname == '/booking'){
+            location.href = "/"
         }
     })
     }
