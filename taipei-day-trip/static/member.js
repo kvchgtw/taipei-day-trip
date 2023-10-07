@@ -43,13 +43,16 @@ let username = ""
 
 //點擊按鈕打開登入視窗
 signInButton.addEventListener('click', function(){
+    initSignIn()
+})
+
+function initSignIn(){
     mask.classList.toggle("mask")
     signInEmail.value = ""
     signInPassword.value = ""
     signInDialog.style.display = "block"
     console.log("sign in event")
-
-})
+}
 
 //點擊Close關閉視窗
 signInCloseButton.addEventListener('click', function(){
@@ -129,11 +132,25 @@ signInSubmitButton.addEventListener('click', function(){
 
 //檢查登入狀態
 window.onload = function(){
-    checkSignIn()
-    console.log("頁面載入時，檢查登入態")
+    checkSignIn({checkBookingSignin: false})
 }
 
-function checkSignIn(){
+function checkSignIn(config={}){
+    if (config.checkBookingSignin){
+        fetch(signInAuthUrl, {
+            method: 'GET',
+            headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
+            })
+        .then(response => response.json())
+        .then(data => {
+            if (data!== null){       
+                console.log("有登入，可以訪問booking")
+                addBookingOrder()
+            }else{
+                initSignIn()
+            }
+        })
+    }else{
     fetch(signInAuthUrl, {
         method: 'GET',
         headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
@@ -143,9 +160,9 @@ function checkSignIn(){
         if (data!== null){       
             signOut()
             username = data.name
-            console.log("memeber username:", username)
         }
     })
+    }
 }
 
 //登出功能

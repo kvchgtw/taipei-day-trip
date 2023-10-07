@@ -42,7 +42,6 @@ let deleteButton = document.querySelector(".delete-button")
 
 
 bookingEntry.addEventListener('click', function(){
-    console.log("點擊預定行程")
     bookingCheckSignIn()
     if (bookingSignInEvent == 0){
         bookingSignInEvent = bookingSignInEvent+1
@@ -64,7 +63,6 @@ function bookingCheckSignIn(){
             signInEmail.value = ""
             signInPassword.value = ""
             signInDialog.style.display = "block"
-            console.log("booking init sign in event")
         }
     })
 }
@@ -80,7 +78,6 @@ function getOrderData(){
     .then(response => response.json())
     .then(data => {
        welcomeUsername = data.name
-       console.log("booking username:", welcomeUsername)
        welcomeTitleName.textContent = welcomeUsername
        userContactName.value = welcomeUsername
 
@@ -97,16 +94,13 @@ function getOrderData(){
 
 
 deleteButton.addEventListener('click', function(){
-        console.log("clicked delete2")
-    
-    
+        
     fetch(apiBookingUrl, {
         method: 'DELETE',
         headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
         })
     .then(response => response.json())
     .then(data => {
-        console.log("Delete API:", data)
         getBookingData_render()
 
     })
@@ -122,12 +116,10 @@ function getBookingData_render(){
     .then(data => {
        
         if (data.data !== null){
-        console.log("data 不是 null: ", data.data)
 
         let bookingimageUrl = data.data.attraction.image
         let bookingSpotName = data.data.attraction.name
         let bookingaddress = data.data.attraction.address
-        // console.log("booking address", bookingaddress)
         let date = data.data.date
         let time = data.data.time
         if (time=="morning"){
@@ -150,7 +142,6 @@ function getBookingData_render(){
         bookingAddressText.textContent = bookingaddress
 
     }else if(data.data==null){
-        console.log("data is null:", data.data)
         bookingInfoArea.innerHTML = ""
         bookingContactArea.innerHTML = ""
         bookingCreditCardArea.innerHTML = ""
@@ -159,12 +150,6 @@ function getBookingData_render(){
         firstSeparator.innerHTML= ""
         secondSeparator.innerHTML= ""
         lastSeparator.innerHTML= ""
-
-        let nullDataWelcomeTitle = document.createElement("div")
-        nullDataWelcomeTitle.classList.add("welcome-title")
-        nullDataWelcomeTitle.innerHTML = "您好，" + welcomeUsername +"，待預定的行程如下："
-        console.log ("null data case username: ", welcomeUsername)
-        bookingInfoArea.appendChild(nullDataWelcomeTitle)
 
         let nullDataText = document.createElement("div")
         nullDataText.classList.add("nullDataText")

@@ -164,7 +164,12 @@ nextButton.onclick=function(){
 };
 
 // 新增預定行程
-addBookingButton.addEventListener('click', function(){
+addBookingButton.addEventListener('click', function(){    
+    checkSignIn({checkBookingSignin: true})
+})
+
+function addBookingOrder(){
+    
     let selectDate = document.getElementById("trip-date").value
     console.log(selectDate)
     if (selectDate == ""){
@@ -192,4 +197,4 @@ addBookingButton.addEventListener('click', function(){
         location.href = "/booking"
     })
     }
-})
+}

@@ -72,18 +72,17 @@
     <div class="navbar-space"></div>
         <hr class="nav-separator">
 <!-- Booking page Content -->
-<div class="booking-info-area" id="booking-info-area">
-    <div class="welcome-title">
-        您好，<span id="welcome-title-name"></span>，待預定的行程如下：</div>
+<div class="welcome-title">您好，<span id="welcome-title-name"></span>，待預定的行程如下：</div>
+    <div class="booking-info-area" id="booking-info-area">
         <div class="booking-info-flex">
             <span class="delete-button" id="delete-button"></span>
             <div class="booking-spot-image" id="booking-spot-image"></div>
             <div class="booking-spot-text">
-                <div class="booking-spot-name" id="booking-spot-name">台北一日遊：<span id="booking-spot-name-title">{name}</span></div>
-                <div class="booking-spot-title">日期：<span class="booking-spot-text" id="booking-spot-date">{date}</span></div>
-                <div class="booking-spot-title">時間：<span class="booking-spot-text" id="booking-spot-time">{time}</span></div>
-                <div class="booking-spot-title">費用：<span class="booking-spot-text" id="booking-spot-price">{price}</span><span class="booking-spot-text"> 元</span></div>
-                <div class="booking-spot-title-address">地點：<span class="booking-spot-text" id="booking-spot-address">{address}</span></div>
+                <div class="booking-spot-name" id="booking-spot-name">台北一日遊：<span id="booking-spot-name-title"></span></div>
+                <div class="booking-spot-title">日期：<span class="booking-spot-text" id="booking-spot-date"></span></div>
+                <div class="booking-spot-title">時間：<span class="booking-spot-text" id="booking-spot-time"></span></div>
+                <div class="booking-spot-title">費用：<span class="booking-spot-text" id="booking-spot-price"></span><span class="booking-spot-text"> 元</span></div>
+                <div class="booking-spot-title-address">地點：<span class="booking-spot-text" id="booking-spot-address"></span></div>
             </div>
         </div>
 </div>
@@ -112,13 +111,13 @@
         <div class="booking-creditcard-area">
             <div class="welcome-input-title">信用卡付款資訊</div>
             <label class="input-label">卡片號碼：
-                <input type="password" placeholder="**** **** **** ****" class="booking-contact-input" id="booking-contact" autocomplete="off">
+                <input type="password" placeholder="**** **** **** ****" class="booking-contact-input" id="booking-contact-cardId" autocomplete="off">
             </label>
             <label class="input-label">過期時間：
-                <input placeholder="MM/YY" class="booking-contact-input" id="booking-contact" autocomplete="off">
+                <input placeholder="MM/YY" class="booking-contact-input" id="booking-contact-exp" autocomplete="off">
             </label>
             <label class="input-label">驗證密碼：
-                <input placeholder="CVV"  class="booking-contact-input" id="booking-contact" autocomplete="off">
+                <input placeholder="CVV"  class="booking-contact-input" id="booking-contact-cvv" autocomplete="off">
             </label>
         </div>
     </div>

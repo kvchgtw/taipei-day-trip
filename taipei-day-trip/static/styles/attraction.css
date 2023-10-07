@@ -427,6 +427,7 @@ font-size: 16px;
 font-style: normal;
 font-weight: 500;
 line-height: normal;
+cursor: pointer;
 }
 
 input[type='radio']:after {
@@ -441,6 +442,8 @@ input[type='radio']:after {
     display: inline-block;
     visibility: visible;
     border: 2px solid white;
+    cursor: pointer;
+
 }
 
 input[type='radio']:checked:after {
@@ -455,6 +458,8 @@ input[type='radio']:checked:after {
     display: inline-block;
     visibility: visible;
     border: 2px solid white;
+    cursor: pointer;
+
 }
 
 .price{
@@ -475,6 +480,7 @@ line-height: 13.3px; /* 83.125% */
 color: #000000;
 text-indent: 5px; /* 控制placeholder字串位置 */
 padding-inline-start: 0px;
+cursor: pointer;
 
 }
 input::-webkit-calendar-picker-indicator{
@@ -483,6 +489,8 @@ input::-webkit-calendar-picker-indicator{
     width: 23px;
     height: 23px;
     margin-right: 10px;
+    cursor: pointer;
+
 
 }
 
@@ -503,6 +511,7 @@ input::-webkit-calendar-picker-indicator{
     background-color: #448899;
     border-width: 0px;
     margin: 17.5px 0px 15px 20px;
+    cursor: pointer;
 
 }
 
