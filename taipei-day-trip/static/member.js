@@ -37,15 +37,21 @@ let localToken =""
 
 let navBarItem = document.getElementById("nav-bar-item")
 
+//取得用戶姓名
+let username = ""
+
+
 //點擊按鈕打開登入視窗
 signInButton.addEventListener('click', function(){
+    initSignIn()
+})
+
+function initSignIn(){
     mask.classList.toggle("mask")
     signInEmail.value = ""
     signInPassword.value = ""
     signInDialog.style.display = "block"
-    console.log("sign in event")
-
-})
+}
 
 //點擊Close關閉視窗
 signInCloseButton.addEventListener('click', function(){
@@ -106,8 +112,13 @@ signInSubmitButton.addEventListener('click', function(){
             window.localStorage.setItem("token",data.token)
             signInDialog.style.display = "none"
             mask.classList.toggle("mask")
-            location.reload();
-
+            if (bookingSignInEvent!==0){
+                location.href = "/booking"
+                bookingSignInEvent = 0
+            }else{
+                location.reload();
+            }
+            
         }else{
             signInErrorMsg.textContent="電子信箱或密碼輸入錯誤"
         }
@@ -120,10 +131,25 @@ signInSubmitButton.addEventListener('click', function(){
 
 //檢查登入狀態
 window.onload = function(){
-    checkSignIn()
+    checkSignIn({checkBookingSignin: false})
 }
 
-function checkSignIn(){
+function checkSignIn(config={}){
+    if (config.checkBookingSignin){
+        fetch(signInAuthUrl, {
+            method: 'GET',
+            headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
+            })
+        .then(response => response.json())
+        .then(data => {
+            if (data!== null){       
+                console.log("有登入，可以訪問booking")
+                addBookingOrder()
+            }else{
+                initSignIn()
+            }
+        })
+    }else{
     fetch(signInAuthUrl, {
         method: 'GET',
         headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
@@ -132,9 +158,17 @@ function checkSignIn(){
     .then(data => {
         if (data!== null){       
             signOut()
+            username = data.name
+        }else if (data == null && location.pathname == '/booking'){
+            location.href = "/"
+            
+            
         }
     })
+    }
 }
+
+//登出功能
 function signOut(){
     signInButton.style.display="none"
     let signout = document.createElement("div")
@@ -144,11 +178,20 @@ function signOut(){
     navBarItem.appendChild(signout)
 
     signout.addEventListener('click', function(){
-        // signout.style.display="none" // 這會在還沒reload前，就關閉了
         signout.innerHTML=""
         localStorage.clear();
-        location.reload();
         signInButton.style.display="flex"
+        let currentUrl = location.pathname
+        console.log("currentUrl: ",currentUrl)
+        let bookingUrl = "/booking"
+        if (currentUrl == bookingUrl){
+            location.href = "/"
+        }else{
+            location.reload();
+
+        }
+        
+
 
     })
 

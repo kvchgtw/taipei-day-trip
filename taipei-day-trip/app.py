@@ -338,10 +338,6 @@ def auth():
 
 
 
-	#把解碼的資料，拿去跟資料庫比對
-	#需要檢查exp是否過期...
-
-#可能是要先拿到前端存的token，然後再解碼，得到ㄓemail & password，然後去資料庫query會員資料，然提供前端id, name, email？
 
 
 @app.route("/api/user/auth", methods = ["PUT"])
@@ -349,16 +345,11 @@ def signin():
 # 先拿到用戶輸入的email, password，然後去資料庫比對。
 	
 	signin_data = request.get_json()
-	# print(signin_data)
+	print(signin_data)
 
 	
 	email = signin_data["email"] 
-	# print("email: ", email)
-	#這個接收資料的方式需要設定form上面的功能，當提交表單時，啟動js函式把資料傳給api。
-	# 但 signin_data = request.get_json() # 接收 JSON 資料轉為 dictionary  這樣就不特別設定form參數，直接用js操作拿到value後，變成json傳給api，然後後端在把json變成字典。
-	# signin_data 裡面自然會有定義好的email, password
 	password = signin_data["password"]
-	# print("password: ", password)
 
 
 	try:
@@ -402,9 +393,213 @@ def signin():
 			cursor.close()
 			con.close()
 
-# 比對成功，就給為期7天的token
-# 比對失敗，報錯400 or 500
+
+@app.route("/api/booking")
+def getBooking():
+
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256") #透過JＷT decode 檢查
+			print("decode",decoded_token) 
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+		return response_error403, 403 # 定義 http code 403
+	
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT member_table.date, member_table.time, member_table.price, attractions.id, attractions.name, attractions.address, attractions.images FROM member_table LEFT JOIN attractions ON member_table.attractionId = attractions.id WHERE member_table.id = %s and member_table.email = %s and member_table.name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+		
+		date = existing_user[0]
+		time = existing_user[1]
+		price = existing_user[2]
+
+		attractionId = existing_user[3]
+		name = existing_user[4]
+		address = existing_user[5]
+
+
+
+		if existing_user and expiredTime > currentTime: #從資料庫確認這用戶存在，且登入態未過期
+			if date and time and price and attractionId and name and address and existing_user[6]:
+				image = json.loads(existing_user[6]) #json.loads 沒辦法處理 None，故將json.loads 放到 if 內處理。
+				response_success = json.dumps({'data': 
+													{"attraction": 
+														{
+														"id": attractionId, 
+														"name": name,
+														"address": address,
+														"image": image[0]
+														},
+													"date": date.strftime('%Y-%m-%d'), 
+													"time": time, 
+													"price": price
+													}
+												},ensure_ascii=False)
+
+				return response_success, 200 # 定義 http code 200
+			else:
+				response_error417 = json.dumps({"data": None}, ensure_ascii=False)
+				return response_error417, 417 # 定義 http code 417
+ 			
+		else:
+			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+			return response_error403, 403 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+			
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+	
+
+
+@app.route("/api/booking", methods = ["POST"])
+def updateBooking():
+	booking_data = request.get_json()
+	attractionId = booking_data["attractionId"]
+	date = booking_data["date"]
+	time = booking_data["time"]
+	price = booking_data["price"]
+
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256")
+			print("decode",decoded_token)
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+		return response_error403, 403 # 定義 http code 403
+	
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, name, attractionId, date, time, price from member_table WHERE id = %s and email = %s and name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+
+		if existing_user and expiredTime > currentTime:
+			# 不論會員是否已有行程資料，都直接覆蓋。
+			cursor.execute("UPDATE member_table SET attractionId = %s, date = %s, time = %s, price = %s WHERE id = %s", (attractionId, date, time, price, id))
+			con.commit() #確定執行
+
+			response_success = json.dumps({'ok': True},ensure_ascii=False)
+		# 若檢查成功，那就要JWT加密然後返回token給前端
+			return response_success, 200 # 定義 http code 200			
+		else:
+			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+			return response_error403, 403 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+			
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+	
+
+@app.route("/api/booking", methods = ["DELETE"])
+def deleteBooking():
+
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256")
+			print("decode",decoded_token)
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+		return response_error403, 403 # 定義 http code 403
+	
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, name, attractionId, date, time, price from member_table WHERE id = %s and email = %s and name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+
+		if existing_user and expiredTime > currentTime:
+			# 不論會員是否已有行程資料，都直接覆蓋。
+			cursor.execute("UPDATE member_table SET attractionId = NULL, date = NULL, time = NULL, price = NULL WHERE id = %s", (id,))
+			con.commit() #確定執行
+
+			response_success = json.dumps({'ok': True},ensure_ascii=False)
+		# 若檢查成功，那就要JWT加密然後返回token給前端
+			return response_success, 200 # 定義 http code 200			
+		else:
+			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+			return response_error403, 403 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+			
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+	
 
 
 app.run(host="0.0.0.0", port=3000)
-

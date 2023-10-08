@@ -10,7 +10,10 @@ body
   
 }
 
-
+a.link{
+  text-decoration: none;
+  color: 448899;
+}
 
 .navbar 
 {

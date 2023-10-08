@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台北一日遊</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/index.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/member.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/booking.css') }}">
+
+
+</head>
+<body>
+<div id="mask"></div>
+<div class="sign-in-flex">
+    <div class="sign-in-dialog" id="sign-in-dialog">
+        <span class="close-button" id="sign-in-close-button"></span>
+        <div class="sign-in-form">
+        <div class="gradient-bar"></div>
+        <div class="sign-in-sign-up-title">
+            登入會員帳號
+        </div>
+        <input class="sign-in-input-email" id="sign-in-email-input" placeholder="輸入電子信箱" autocomplete="off">
+        <input class="sign-in-input-password" id="sign-in-password-input" placeholder="輸入密碼" type = "password">
+        <button type="submit" class="sign-in-sign-up-button" id="sign-in-submit-button" >登入帳戶</button>
+        <div class="error-msg" id="sign-in-error-msg"></div>
+        <div class="switch-to-sign-up" id="switch-to-sign-up">還沒有帳戶？點此註冊</div>
+        </div>
+    </div>
+    <div class="sign-up-dialog" id="sign-up-dialog">
+        <span class="close-button" id="sign-up-close-button"></span>
+        <div class="sign-up-form">
+            <div class="gradient-bar"></div>
+            <div class="sign-in-sign-up-title">
+                註冊會員帳號
+            </div>
+            <input class="sign-up-input-name" id="sign-up-name-input" placeholder="輸入姓名" autocomplete="off">
+            <input class="sign-up-input-email" id="sign-up-email-input" placeholder="輸入電子信箱" autocomplete="off">
+            <input class="sign-up-input-password" id="sign-up-password-input" placeholder="輸入密碼" type = "password">
+            <button type="submit" class="sign-in-sign-up-button" id="sign-up-submit-button" >註冊新帳戶</button>
+            <div class="error-msg" id="sign-up-error-msg"></div>
+            <div class="switch-to-sign-up" id="switch-to-sign-in">已經有帳戶了？點此登入</div>
+        </div>
+    </div>
+</div>    
+
+    <div class="navbar">
+
+        <div class="navbar-box">
+
+            <div class="nav-homepage">
+            <a href = "/" class="link" >
+            <div class="nav-homepage-title">
+                台北一日遊
+            </div>
+             </a>
+            </div>
+        
+            <div class="item" id="nav-bar-item"> 
+                <!-- 這裡的figma line height = 13.3, 但是設定後整體高度跟figma不一致。 -->
+                <div class="nav-button" id="booking-entry-button">
+                    預定行程
+                </div>
+                <div class="nav-button" id="sign-in-button">
+                    登入/註冊
+                </div>
+            </div>
+        
+        </div>
+        
+    </div>
+    
+    <div class="navbar-space"></div>
+        <hr class="nav-separator">
+<!-- Booking page Content -->
+<div class="welcome-title">您好，<span id="welcome-title-name"></span>，待預定的行程如下：</div>
+    <div class="booking-info-area" id="booking-info-area">
+        <div class="booking-info-flex">
+            <span class="delete-button" id="delete-button"></span>
+            <div class="booking-spot-image" id="booking-spot-image"></div>
+            <div class="booking-spot-text">
+                <div class="booking-spot-name" id="booking-spot-name">台北一日遊：<span id="booking-spot-name-title"></span></div>
+                <div class="booking-spot-title">日期：<span class="booking-spot-text" id="booking-spot-date"></span></div>
+                <div class="booking-spot-title">時間：<span class="booking-spot-text" id="booking-spot-time"></span></div>
+                <div class="booking-spot-title">費用：<span class="booking-spot-text" id="booking-spot-price"></span><span class="booking-spot-text"> 元</span></div>
+                <div class="booking-spot-title-address">地點：<span class="booking-spot-text" id="booking-spot-address"></span></div>
+            </div>
+        </div>
+</div>
+<div class="hr-container" id="first-separator">
+    <hr class="separator">
+</div>
+    <div class="booking-contact-area-flex" id="booking-contact-area-flex">
+        <div class="booking-contact-area">
+            <div class="welcome-input-title">您的聯絡資訊</div>
+            <label class="input-label">聯絡姓名：
+                <input class="booking-contact-input" id="booking-contact-name" autocomplete="off">
+            </label>
+            <label class="input-label">聯絡信箱：
+                <input type="emai" class="booking-contact-input" id="booking-contact-email" autocomplete="off">
+            </label>
+            <label class="input-label">手機號碼：
+                <input type="tel" class="booking-contact-input" id="booking-contact-phone" autocomplete="off">
+            </label>
+            <div class="booking-note-text">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+        </div>
+    </div>    
+<div class="hr-container" id="second-separator">
+    <hr class="separator">
+</div>
+    <div class="booking-creditcard-area-flex" id="booking-creditcard-area-flex">
+        <div class="booking-creditcard-area">
+            <div class="welcome-input-title">信用卡付款資訊</div>
+            <label class="input-label">卡片號碼：
+                <input type="password" placeholder="**** **** **** ****" class="booking-contact-input" id="booking-contact-cardId" autocomplete="off">
+            </label>
+            <label class="input-label">過期時間：
+                <input placeholder="MM/YY" class="booking-contact-input" id="booking-contact-exp" autocomplete="off">
+            </label>
+            <label class="input-label">驗證密碼：
+                <input placeholder="CVV"  class="booking-contact-input" id="booking-contact-cvv" autocomplete="off">
+            </label>
+        </div>
+    </div>
+<div class="hr-container" id="last-separator">
+    <hr class="separator">
+</div>
+<div class="total-price">總價：新台幣 <span id="total-price">{price}</span><span> 元</span></div>
+<div class="cta-button">
+    <button type="submit" class="order-button" id="confirm-order-button">確認訂購並付款</button>
+</div>
+
+
+       
+    
+
+<!-- Booking page Content End -->
+
+    <div class="bottom-space"></div>
+
+    <div class="footer" id="bottom-element">
+    <span class="footer-text" id="footer-text">
+    COPYRIGHT © 2023 台北一日遊
+    </span>
+    </div>
+    
+    <script src="{{url_for('static', filename='index.js')}}"></script>
+    <script src="{{url_for('static', filename='member.js')}}"></script>
+    <script src="{{url_for('static', filename='booking.js')}}"></script>
+
+</body>
+</html>

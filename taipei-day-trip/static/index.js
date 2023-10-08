@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function(){
   });
 
 
-window.onload = function(){
     
     //Search Function
     document.getElementById("search-form").addEventListener("submit", function (event) {
@@ -205,7 +204,7 @@ window.onload = function(){
         
     });
 
-};
+
 
 
 //生成div函式
