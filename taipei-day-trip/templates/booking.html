@@ -109,25 +109,32 @@
 </div>
     <div class="booking-creditcard-area-flex" id="booking-creditcard-area-flex">
         <div class="booking-creditcard-area">
-            <div class="welcome-input-title">信用卡付款資訊</div>
-            <label class="input-label">卡片號碼：
-                <input type="password" placeholder="**** **** **** ****" class="booking-contact-input" id="booking-contact-cardId" autocomplete="off">
-            </label>
-            <label class="input-label">過期時間：
-                <input placeholder="MM/YY" class="booking-contact-input" id="booking-contact-exp" autocomplete="off">
-            </label>
-            <label class="input-label">驗證密碼：
-                <input placeholder="CVV"  class="booking-contact-input" id="booking-contact-cvv" autocomplete="off">
-            </label>
+
+            <div class="welcome-input-title">信用卡付款資訊</div>            
+            <div class="card-container"><span class="input-label">卡片號碼：</span><div class="tpfield" id="card-number"></div></div>
+            <div class="card-container"><span class="input-label">過期時間：</span><div class="tpfield" id="card-expiration-date"></div></div>
+            <div class="card-container"><span class="input-label">驗證密碼：</span><div class="tpfield" id="card-ccv"></div></div>
+            
+                    <!-- <label class="tpfield">卡片號碼： 
+                    <div  class="booking-contact-input" id="card-number" autocomplete="off">
+                    </label>
+                    <label class="tpfield">過期時間：
+                        <input  class="booking-contact-input" id="card-expiration-date" autocomplete="off">
+                    </label>
+                    <label class="tpfield">驗證密碼：
+                        <input   class="booking-contact-input" id="card-ccv" autocomplete="off">
+                    </label>
+                 -->
         </div>
     </div>
 <div class="hr-container" id="last-separator">
     <hr class="separator">
 </div>
-<div class="total-price">總價：新台幣 <span id="total-price">{price}</span><span> 元</span></div>
+<div class="total-price">總價：新台幣 <span id="total-price"></span><span> 元</span></div>
 <div class="cta-button">
-    <button type="submit" class="order-button" id="confirm-order-button">確認訂購並付款</button>
+    <button class="order-button" id="confirm-order-button" >確認訂購並付款</button>
 </div>
+
 
 
        
@@ -146,6 +153,10 @@
     <script src="{{url_for('static', filename='index.js')}}"></script>
     <script src="{{url_for('static', filename='member.js')}}"></script>
     <script src="{{url_for('static', filename='booking.js')}}"></script>
+    <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
+    <script src="{{url_for('static', filename='tappay.js')}}"></script>
+    
+
 
 </body>
 </html>

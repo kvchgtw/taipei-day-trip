@@ -292,11 +292,35 @@ font-style: normal;
 font-weight: 500;
 line-height: 13.3px; /* 83.125% */
 }
+
+
+.tpfield {
+    margin: 7.5px 0px 7.5px 15px;
+    width: 200px;
+    height: 38px;
+    border: 1px solid  #E8E8E8;
+    border-radius: 5px;
+    padding: 0px 0px 0px 15px;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 13.3px; /* 83.125% */
+
+  }
+  
+  .tappay-field-focus {
+    outline: 2px solid #489;
+  } 
+
+.card-container{
+    display: flex;
+    align-items: center;
+}
 .booking-contact-input{
     margin: 15px 0px 0px 15px;
     width: 200px;
     height: 38px;
-    border: 1px solid  #CCCCCC;
+    border: 1px solid  #E8E8E8;
     border-radius: 5px;
     padding: 0px 0px 0px 15px;
     font-size: 16px;
@@ -304,6 +328,9 @@ line-height: 13.3px; /* 83.125% */
     font-weight: 500;
     line-height: 13.3px; /* 83.125% */
     
+}
+.booking-contact-input:focus{
+    outline: #489 2px solid;
 }
 
 .booking-note-text{

@@ -2,6 +2,9 @@ from flask import *
 import mysql.connector
 import jwt
 from datetime import datetime, timedelta
+import requests
+import time
+
 
 key = "secret"
 
@@ -601,5 +604,127 @@ def deleteBooking():
 			con.close()
 	
 
+@app.route("/api/orders", methods = ["POST"])
+def addOrder():
+	partnerKey = "partner_IOYbHcEXBUd3LIwR7A5ekYcJ7n7C3h4qYUp6AlNhDKQtVcHRC2tI0gMj"
+	merchant_id = "kvcc_CTBC"
+	tappayServerUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
 
+	tappayHeaders = {
+        'Content-Type': 'application/json',  
+        'x-api-key': partnerKey
+    }
+	
+	orderData = request.get_json()
+	# print(orderData)
+
+	prime = orderData["prime"] 
+	contactName = orderData['order']['contact']['name']
+	# print(contactName) #test ok
+
+	contactPhone = orderData['order']["contact"]["phone"]
+	contactEmail = orderData['order']["contact"]["email"]
+	orderPrice = orderData["order"]["price"]
+
+	attractionId = orderData["order"]["trip"]["attraction"]["id"]
+
+	attractionName = orderData["order"]["trip"]["attraction"]["name"]
+	
+	attractionaddress = orderData["order"]["trip"]["attraction"]["address"]
+	attractionimage = orderData["order"]["trip"]["attraction"]["image"]
+	date = orderData["order"]["trip"]["date"]
+
+	time = orderData["order"]["trip"]["time"]
+	
+	dataSendtoTappay = {}
+
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256")
+			print("decode",decoded_token)
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+		return response_error403, 403 # 定義 http code 403
+	
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, name, price from member_table WHERE id = %s and email = %s and name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+
+		if existing_user and expiredTime > currentTime:
+			cursor.execute("UPDATE member_table SET contactName = %s, contactEmail = %s, contactPhone = %s WHERE id = %s", (contactName, contactEmail, contactPhone, id))
+			con.commit()
+
+			dataSendtoTappay = {
+								"prime": prime,
+								"partner_key": partnerKey,
+								"merchant_id": merchant_id,
+								"details": contactName + contactEmail,
+								"amount": orderPrice,
+								"cardholder": {
+									"phone_number": contactPhone,
+									"name": contactName,
+									"email": contactEmail,
+									"zip_code": None,
+									"address": None,
+									"national_id": None
+								},
+								"remember": True
+								}
+			try: 
+				tappayResponse = requests.post(tappayServerUrl, json=dataSendtoTappay, headers=tappayHeaders)
+				orderNumber = datetime.now().strftime('%Y%m%d%H%M%S')
+				status = tappayResponse.json()["status"]
+				#要把訂單編號跟status寫入資料庫
+				
+				if status == 0:
+					message = "付款成功"
+					response_success = json.dumps({'data': {"number": orderNumber, "payment": {"status": status, "message": message}}},ensure_ascii=False)
+					return response_success, 200
+				
+				
+				else: #訂單建立成功，但付款失敗
+					message = "付款失敗"
+					response_failed = json.dumps({'data': {"number": orderNumber, "payment": {"status": status, "message": message}}},ensure_ascii=False)
+					return response_failed
+				
+			except Exception as e:
+				response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤, 付款失敗'},ensure_ascii=False)
+				return response_error500, 500 # 定義 http error code 500
+						
+
+		else:
+			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+			return response_error403, 403 # 定義 http code 400
+	
+	except Exception as e:
+		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+		return response_error500, 500 # 定義 http error code 500
+			
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+	
 app.run(host="0.0.0.0", port=3000)
