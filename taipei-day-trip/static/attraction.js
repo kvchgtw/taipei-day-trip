@@ -1,4 +1,3 @@
-
 //新增預定行程功能
 let addBookingButton = document.getElementById("start-booking-button")
 
@@ -186,7 +185,7 @@ function addBookingOrder(){
 
     let bookingData = {"attractionId": attractionId, "date": selectDate, "time": selectTime, "price": priceInt}
 
-    fetch(apiBookingUrl, {
+    fetch("/api/booking", {
         method: 'POST',
         headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token"), 'Content-Type': 'application/json'},
         body: JSON.stringify(bookingData)

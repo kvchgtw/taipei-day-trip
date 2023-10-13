@@ -431,7 +431,7 @@ def getBooking():
 			)
 		
 		cursor = con.cursor()
-		cursor.execute("SELECT member_table.date, member_table.time, member_table.price, attractions.id, attractions.name, attractions.address, attractions.images FROM member_table LEFT JOIN attractions ON member_table.attractionId = attractions.id WHERE member_table.id = %s and member_table.email = %s and member_table.name = %s", (id, email, name))
+		cursor.execute("SELECT member_table.date, member_table.time, member_table.price, attractions.id, attractions.name, attractions.address, attractions.images, member_table.orderStatus FROM member_table LEFT JOIN attractions ON member_table.attractionId = attractions.id WHERE member_table.id = %s and member_table.email = %s and member_table.name = %s", (id, email, name))
 		existing_user = cursor.fetchone()
 		
 		date = existing_user[0]
@@ -441,6 +441,7 @@ def getBooking():
 		attractionId = existing_user[3]
 		name = existing_user[4]
 		address = existing_user[5]
+		# status = existing_user[7]
 
 
 
@@ -584,7 +585,8 @@ def deleteBooking():
 
 		if existing_user and expiredTime > currentTime:
 			# 不論會員是否已有行程資料，都直接覆蓋。
-			cursor.execute("UPDATE member_table SET attractionId = NULL, date = NULL, time = NULL, price = NULL WHERE id = %s", (id,))
+			# 刪除掉訂單相關紀錄
+			cursor.execute("UPDATE member_table SET attractionId = NULL, date = NULL, time = NULL, price = NULL, contactName = NULL, contactEmail = NULL, contactPhone = NULL, orderNumber = NULL, orderStatus = NULL WHERE id = %s", (id,))
 			con.commit() #確定執行
 
 			response_success = json.dumps({'ok': True},ensure_ascii=False)
@@ -673,8 +675,13 @@ def addOrder():
 		existing_user = cursor.fetchone()
 
 		if existing_user and expiredTime > currentTime:
-			cursor.execute("UPDATE member_table SET contactName = %s, contactEmail = %s, contactPhone = %s WHERE id = %s", (contactName, contactEmail, contactPhone, id))
-			con.commit()
+			# cursor.execute("UPDATE order_table SET contactName = %s, contactEmail = %s, contactPhone = %s WHERE id = %s", (contactName, contactEmail, contactPhone, id))
+			# con.commit()
+			
+			orderNumber = datetime.now().strftime('%Y%m%d%H%M%S')
+			cursor.execute("INSERT into order_table (contactName, contactEmail, contactPhone, orderNumber, member_id) VALUES (%s, %s, %s, %s, %s)", (contactName, contactEmail, contactPhone, orderNumber, id))
+			con.commit()			
+
 
 			dataSendtoTappay = {
 								"prime": prime,
@@ -694,10 +701,12 @@ def addOrder():
 								}
 			try: 
 				tappayResponse = requests.post(tappayServerUrl, json=dataSendtoTappay, headers=tappayHeaders)
-				orderNumber = datetime.now().strftime('%Y%m%d%H%M%S')
 				status = tappayResponse.json()["status"]
 				#要把訂單編號跟status寫入資料庫
-				
+
+				cursor.execute("UPDATE order_table SET orderStatus = %s WHERE member_id = %s and orderNumber = %s", (status, id, orderNumber))
+				con.commit()
+
 				if status == 0:
 					message = "付款成功"
 					response_success = json.dumps({'data': {"number": orderNumber, "payment": {"status": status, "message": message}}},ensure_ascii=False)
@@ -712,6 +721,8 @@ def addOrder():
 			except Exception as e:
 				response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤, 付款失敗'},ensure_ascii=False)
 				return response_error500, 500 # 定義 http error code 500
+
+			
 						
 
 		else:
@@ -726,5 +737,104 @@ def addOrder():
 		if con.is_connected():
 			cursor.close()
 			con.close()
+
+@app.route("/api/order/<orderNumber>")
+def getOrderData(orderNumber):
+	try:
+		authorization_header = request.headers.get('Authorization')
+		
+		parts = authorization_header.split()
+		token = parts[1]
+		bearer = parts[0]
+		
+		if bearer == "Bearer" and token:
+			decoded_token = jwt.decode(token, key, algorithms="HS256")
+			print("decode",decoded_token)
+
+			expiredTime = decoded_token["exp"]
+			currentTime = int(datetime.utcnow().timestamp())
+
+			id = decoded_token['id']
+			email = decoded_token['email']
+			name = decoded_token['name']
+	
+	except Exception as e:
+		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
+		return response_error403, 403 # 定義 http code 403
+	
+	try:
+		con = mysql.connector.connect(
+			user='root',
+			password='1qaz@Wsx',
+			host='localhost',
+			database='taipei_day_trip_db'
+			)
+		
+		cursor = con.cursor()
+		cursor.execute("SELECT id, email, name, price from member_table WHERE id = %s and email = %s and name = %s", (id, email, name))
+		existing_user = cursor.fetchone()
+
+		if existing_user and expiredTime > currentTime:
+			cursor.execute("""
+        SELECT 
+            member_table.date, 
+            member_table.time, 
+            member_table.price, 
+            attractions.id, 
+            attractions.name, 
+            attractions.address, 
+            attractions.images, 
+            order_table.orderNumber, 
+            order_table.contactName, 
+            order_table.contactEmail, 
+            order_table.contactPhone, 
+            order_table.orderStatus 
+        FROM 
+            member_table 
+        LEFT JOIN 
+            attractions ON member_table.attractionId = attractions.id 
+        LEFT JOIN 
+            order_table ON member_table.id = order_table.member_id 
+        WHERE 
+            member_table.id = %s 
+            AND member_table.email = %s 
+            AND member_table.name = %s
+    """, (id, email, name))
+
+			# cursor.execute("SELECT orderNumber from order_table WHERE member_id = %s", (id,))
+			queryData = cursor.fetchone()
+			print(queryData)
+
+
+			# response_success = json.dumps({
+			# 								"data": {
+			# 									"number": queryOrderNumber,
+			# 									"price": 2000,
+			# 									"trip": {
+			# 									"attraction": {
+			# 										"id": 10,
+			# 										"name": "平安鐘",
+			# 										"address": "臺北市大安區忠孝東路 4 段",
+			# 										"image": "https://yourdomain.com/images/attraction/10.jpg"
+			# 									},
+			# 									"date": "2022-01-31",
+			# 									"time": "afternoon"
+			# 									},
+			# 									"contact": {
+			# 									"name": "彭彭彭",
+			# 									"email": "ply@ply.com",
+			# 									"phone": "0912345678"
+			# 									},
+			# 									"status": 1
+			# 								}
+			# 		},ensure_ascii=False)
+			return "ok"
+	finally:
+		if con.is_connected():
+			cursor.close()
+			con.close()
+
+
+			
 	
 app.run(host="0.0.0.0", port=3000)

@@ -1,3 +1,5 @@
+let apiOrderUrl = "/api/orders"
+
 TPDirect.setupSDK(137381, 'app_lAEQcuIT7wCTBrUjoHveDTWj7vAfHETbaAYoKCzfTe5QyC75a9ingpkJ97JD', 'sandbox')
 
 TPDirect.card.setup({
@@ -49,7 +51,7 @@ const confirmOrderBtn = document.getElementById("confirm-order-button")
         TPDirect.card.onUpdate(function (update) {
             /* Disable / enable submit button depend on update.canGetPrime  */
             /* ============================================================ */
-            console.log(update.canGetPrime)
+            // console.log(update.canGetPrime)
             // update.canGetPrime === true
             //     --> you can call TPDirect.card.getPrime()
             // const submitButton = document.querySelector('button[type="submit"]')
@@ -62,42 +64,7 @@ const confirmOrderBtn = document.getElementById("confirm-order-button")
             }
 
 
-            /* Change card type display when card type change */
-            /* ============================================== */
-
-            // cardTypes = ['visa', 'mastercard', ...]
-            // var newType = update.cardType === 'unknown' ? '' : update.cardType
-            // $('#cardtype').text(newType)
-
-
-
-            /* Change form-group style when tappay field status change */
-            /* ======================================================= */
-
-            // number 欄位是錯誤的
-            // if (update.status.number === 2) {
-            //     setNumberFormGroupToError('.card-number-group')
-            // } else if (update.status.number === 0) {
-            //     setNumberFormGroupToSuccess('.card-number-group')
-            // } else {
-            //     setNumberFormGroupToNormal('.card-number-group')
-            // }
-
-            // if (update.status.expiry === 2) {
-            //     setNumberFormGroupToError('.expiration-date-group')
-            // } else if (update.status.expiry === 0) {
-            //     setNumberFormGroupToSuccess('.expiration-date-group')
-            // } else {
-            //     setNumberFormGroupToNormal('.expiration-date-group')
-            // }
-
-            // if (update.status.ccv === 2) {
-            //     setNumberFormGroupToError('.ccv-group')
-            // } else if (update.status.ccv === 0) {
-            //     setNumberFormGroupToSuccess('.ccv-group')
-            // } else {
-            //     setNumberFormGroupToNormal('.ccv-group')
-            // }
+            
         })
 
 
@@ -105,85 +72,79 @@ const creditCardForm = document.getElementById("creditCard-form")
 console.log(creditCardForm)
 
 let prime = ''
+let bookingContactName = document.getElementById("booking-contact-name")
+let bookingContactEmail = document.getElementById("booking-contact-email")
+let bookingContactPhone = document.getElementById("booking-contact-phone")
+
 
 confirmOrderBtn.addEventListener("click", function(event){;
-console.log("card button clicked")
+
+    event.preventDefault()
+    
+    const tappayStatus = TPDirect.card.getTappayFieldsStatus()
+
+    // Check TPDirect.card.getTappayFieldsStatus().canGetPrime before TPDirect.card.getPrime
+    if (tappayStatus.canGetPrime === false) {
+        alert('伺服器內部錯誤，請再試一次。can not get prime')
+        return
+    }
+
+    // Get prime
+    TPDirect.card.getPrime(function (result) {
+        if (result.status !== 0) {
+            alert('get prime error ' + result.msg)
+            return
+        }
+        // alert('get prime 成功，prime: ' + result.card.prime)
+        prime = result.card.prime
+    })
 
 
-            event.preventDefault()
-            
-            // // fix keyboard issue in iOS device
-            // forceBlurIos()
-            
-            const tappayStatus = TPDirect.card.getTappayFieldsStatus()
-            console.log(tappayStatus)
-
-            // Check TPDirect.card.getTappayFieldsStatus().canGetPrime before TPDirect.card.getPrime
-            if (tappayStatus.canGetPrime === false) {
-                alert('can not get prime')
-                return
+    let orderData = {
+        "prime": prime,
+        "order": {
+            "price": price,
+            "trip": {
+            "attraction": {
+                "id": bookingAttractionId,
+                "name": bookingSpotName,
+                "address": bookingaddress,
+                "image": bookingimageUrl
+            },
+            "date": date,
+            "time": time
+            },
+            "contact": {
+            "name": bookingContactName.value,
+            "email": bookingContactEmail.value,
+            "phone": bookingContactPhone.value
             }
+        }
+        }
 
-            // Get prime
-            TPDirect.card.getPrime(function (result) {
-                if (result.status !== 0) {
-                    alert('get prime error ' + result.msg)
-                    return
-                }
-                alert('get prime 成功，prime: ' + result.card.prime)
-                prime = result.card.prime
-                // var command = `
-                // Use following command to send to server \n\n
-                // curl -X POST https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime \\
-                // -H 'content-type: application/json' \\
-                // -H 'x-api-key: partner_6ID1DoDlaPrfHw6HBZsULfTYtDmWs0q0ZZGKMBpp4YICWBxgK97eK3RM' \\
-                // -d '{
-                //     "partner_key": "partner_6ID1DoDlaPrfHw6HBZsULfTYtDmWs0q0ZZGKMBpp4YICWBxgK97eK3RM",
-                //     "prime": "${result.card.prime}",
-                //     "amount": "1",
-                //     "merchant_id": "GlobalTesting_CTBC",
-                //     "details": "Some item",
-                //     "cardholder": {
-                //         "phone_number": "+886923456789",
-                //         "name": "王小明",
-                //         "email": "LittleMing@Wang.com",
-                //         "zip_code": "100",
-                //         "address": "台北市天龍區芝麻街1號1樓",
-                //         "national_id": "A123456789"
-                //     }
-                // }'`.replace(/                /g, '')
-                // document.querySelector('#curl').innerHTML = command
-            })
+
+
+    fetch(apiOrderUrl, {
+        method: 'POST',
+        headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token"), 'Content-Type': 'application/json'},
+        body: JSON.stringify(orderData)
         })
-        
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+        location.href = "/thankyou"
+        deleteBooking()
 
-        // function setNumberFormGroupToError(selector) {
-        //     $(selector).addClass('has-error')
-        //     $(selector).removeClass('has-success')
-        // }
-
-        // function setNumberFormGroupToSuccess(selector) {
-        //     $(selector).removeClass('has-error')
-        //     $(selector).addClass('has-success')
-        // }
-
-        // function setNumberFormGroupToNormal(selector) {
-        //     $(selector).removeClass('has-error')
-        //     $(selector).removeClass('has-success')
-        // }
         
-        // function forceBlurIos() {
-        //     if (!isIos()) {
-        //         return
-        //     }
-        //     var input = document.createElement('input')
-        //     input.setAttribute('type', 'text')
-        //     // Insert to active element to ensure scroll lands somewhere relevant
-        //     document.activeElement.prepend(input)
-        //     input.focus()
-        //     input.parentNode.removeChild(input)
-        // }
+    })   
+})
         
-        // function isIos() {
-        //     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        // }
+function deleteBooking(){
+    fetch(apiBookingUrl, {
+        method: 'DELETE',
+        headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
+        })
+    .then(response => response.json())
+    
+}
+     
