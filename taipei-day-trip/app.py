@@ -471,9 +471,9 @@ def getBooking():
 			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
 			return response_error403, 403 # 定義 http code 400
 	
-	except Exception as e:
-		response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
-		return response_error500, 500 # 定義 http error code 500
+	# except Exception as e:
+	# 	response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+	# 	return response_error500, 500 # 定義 http error code 500
 			
 	finally:
 		if con.is_connected():
