@@ -167,8 +167,11 @@ function checkSignIn(config={}){
         }else if (data == null && location.pathname == '/booking'){
             location.href = "/"
             
+        }else if (data == null && location.pathname == '/thankyou'){
+            location.href = "/"
             
         }
+
     })
     }
 }

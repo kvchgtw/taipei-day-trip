@@ -1,5 +1,6 @@
 let apiOrderUrl = "/api/orders"
 // let orderData = {}
+let thankyouOrderNumber = ''
 
 TPDirect.setupSDK(137381, 'app_lAEQcuIT7wCTBrUjoHveDTWj7vAfHETbaAYoKCzfTe5QyC75a9ingpkJ97JD', 'sandbox')
 
@@ -140,16 +141,22 @@ confirmOrderBtn.addEventListener("click", function(event){
             });
     
             const paymentData = await response.json();
-            console.log(paymentData.data.number);
+            console.log(paymentData.data.number, paymentData);
 
-            // let orderNumber = paymentData.data.number
-            // console.log("order number:", orderNumber)
+            if (paymentData.data.payment.status != 0){
+                alert('付款失敗，請重新付款。error code: '+ paymentData.data.payment.status)
+            }
+
+            // 要把'?number=' + 訂單編號
+
+            thankyouOrderNumber = await paymentData.data.number
+            console.log("tks order number:", thankyouOrderNumber)
     
             // 在這裡可以處理伺服器的回應
             
 
 
-            // location.href = "/thankyou";
+            location.href = "/thankyou?number=" + thankyouOrderNumber;
             deleteBooking();
         } catch (error) {
             console.error(error);

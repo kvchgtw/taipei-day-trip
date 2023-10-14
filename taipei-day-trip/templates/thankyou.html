@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台北一日遊</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/index.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/member.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/booking.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/thankyou.css') }}">
+
+
+</head>
+<body>
+<div id="mask"></div>
+<div class="sign-in-flex">
+    <div class="sign-in-dialog" id="sign-in-dialog">
+        <span class="close-button" id="sign-in-close-button"></span>
+        <div class="sign-in-form">
+        <div class="gradient-bar"></div>
+        <div class="sign-in-sign-up-title">
+            登入會員帳號
+        </div>
+        <input class="sign-in-input-email" id="sign-in-email-input" placeholder="輸入電子信箱" autocomplete="off">
+        <input class="sign-in-input-password" id="sign-in-password-input" placeholder="輸入密碼" type = "password">
+        <button type="submit" class="sign-in-sign-up-button" id="sign-in-submit-button" >登入帳戶</button>
+        <div class="error-msg" id="sign-in-error-msg"></div>
+        <div class="switch-to-sign-up" id="switch-to-sign-up">還沒有帳戶？點此註冊</div>
+        </div>
+    </div>
+    <div class="sign-up-dialog" id="sign-up-dialog">
+        <span class="close-button" id="sign-up-close-button"></span>
+        <div class="sign-up-form">
+            <div class="gradient-bar"></div>
+            <div class="sign-in-sign-up-title">
+                註冊會員帳號
+            </div>
+            <input class="sign-up-input-name" id="sign-up-name-input" placeholder="輸入姓名" autocomplete="off">
+            <input class="sign-up-input-email" id="sign-up-email-input" placeholder="輸入電子信箱" autocomplete="off">
+            <input class="sign-up-input-password" id="sign-up-password-input" placeholder="輸入密碼" type = "password">
+            <button type="submit" class="sign-in-sign-up-button" id="sign-up-submit-button" >註冊新帳戶</button>
+            <div class="error-msg" id="sign-up-error-msg"></div>
+            <div class="switch-to-sign-up" id="switch-to-sign-in">已經有帳戶了？點此登入</div>
+        </div>
+    </div>
+</div>    
+
+    <div class="navbar">
+
+        <div class="navbar-box">
+
+            <div class="nav-homepage">
+            <a href = "/" class="link" >
+            <div class="nav-homepage-title">
+                台北一日遊
+            </div>
+             </a>
+            </div>
+        
+            <div class="item" id="nav-bar-item"> 
+                <!-- 這裡的figma line height = 13.3, 但是設定後整體高度跟figma不一致。 -->
+                <div class="nav-button" id="booking-entry-button">
+                    預定行程
+                </div>
+                <div class="nav-button" id="sign-in-button">
+                    登入/註冊
+                </div>
+            </div>
+        
+        </div>
+        
+    </div>
+    
+    <div class="navbar-space"></div>
+        <hr class="nav-separator">
+<!-- Booking page Content -->
+<div class="thankyou-title" id="thankyou-title">行程預定成功，您的訂單編號：<br><span id="order-number-text"></span></div></div>
+<div class="thankyou-content" id="thankyou-content">請記住此編號以查詢訂單。</div>
+
+<!-- Booking page Content End -->
+
+    <div class="bottom-space"></div>
+
+    <div class="footer" id="bottom-element">
+    <span class="footer-text" id="footer-text">
+    COPYRIGHT © 2023 台北一日遊
+    </span>
+    </div>
+    
+    <script src="{{url_for('static', filename='member.js')}}"></script>
+    <script src="{{url_for('static', filename='booking.js')}}"></script>
+    <script src="{{url_for('static', filename='thankyou.js')}}"></script>
+
+
+
+</body>
+</html>
