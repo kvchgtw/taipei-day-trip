@@ -431,7 +431,7 @@ def getBooking():
 			)
 		
 		cursor = con.cursor()
-		cursor.execute("SELECT member_table.date, member_table.time, member_table.price, attractions.id, attractions.name, attractions.address, attractions.images, member_table.orderStatus FROM member_table LEFT JOIN attractions ON member_table.attractionId = attractions.id WHERE member_table.id = %s and member_table.email = %s and member_table.name = %s", (id, email, name))
+		cursor.execute("SELECT member_table.date, member_table.time, member_table.price, attractions.id, attractions.name, attractions.address, attractions.images FROM member_table LEFT JOIN attractions ON member_table.attractionId = attractions.id WHERE member_table.id = %s and member_table.email = %s and member_table.name = %s", (id, email, name))
 		existing_user = cursor.fetchone()
 		
 		date = existing_user[0]
