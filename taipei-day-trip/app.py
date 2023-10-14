@@ -608,34 +608,24 @@ def deleteBooking():
 
 @app.route("/api/orders", methods = ["POST"])
 def addOrder():
+	
 	partnerKey = "partner_IOYbHcEXBUd3LIwR7A5ekYcJ7n7C3h4qYUp6AlNhDKQtVcHRC2tI0gMj"
 	merchant_id = "kvcc_CTBC"
 	tappayServerUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
-
 	tappayHeaders = {
         'Content-Type': 'application/json',  
         'x-api-key': partnerKey
     }
 	
 	orderData = request.get_json()
-	# print(orderData)
 
 	prime = orderData["prime"] 
 	contactName = orderData['order']['contact']['name']
-	# print(contactName) #test ok
-
 	contactPhone = orderData['order']["contact"]["phone"]
 	contactEmail = orderData['order']["contact"]["email"]
 	orderPrice = orderData["order"]["price"]
-
 	attractionId = orderData["order"]["trip"]["attraction"]["id"]
-
-	attractionName = orderData["order"]["trip"]["attraction"]["name"]
-	
-	attractionaddress = orderData["order"]["trip"]["attraction"]["address"]
-	attractionimage = orderData["order"]["trip"]["attraction"]["image"]
 	date = orderData["order"]["trip"]["date"]
-
 	time = orderData["order"]["trip"]["time"]
 	
 	dataSendtoTappay = {}
@@ -660,7 +650,7 @@ def addOrder():
 	
 	except Exception as e:
 		response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
-		return response_error403, 403 # 定義 http code 403
+		return response_error403, 403 
 	
 	try:
 		con = mysql.connector.connect(
@@ -675,13 +665,10 @@ def addOrder():
 		existing_user = cursor.fetchone()
 
 		if existing_user and expiredTime > currentTime:
-			# cursor.execute("UPDATE order_table SET contactName = %s, contactEmail = %s, contactPhone = %s WHERE id = %s", (contactName, contactEmail, contactPhone, id))
-			# con.commit()
 			
 			orderNumber = datetime.now().strftime('%Y%m%d%H%M%S')
-			cursor.execute("INSERT into order_table (contactName, contactEmail, contactPhone, orderNumber, member_id) VALUES (%s, %s, %s, %s, %s)", (contactName, contactEmail, contactPhone, orderNumber, id))
+			cursor.execute("INSERT into order_table (contactName, contactEmail, contactPhone, orderNumber, member_id, attractionId, date, time, price) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (contactName, contactEmail, contactPhone, orderNumber, id, attractionId, date, time, orderPrice))
 			con.commit()			
-
 
 			dataSendtoTappay = {
 								"prime": prime,
@@ -699,6 +686,8 @@ def addOrder():
 								},
 								"remember": True
 								}
+			print("BE received data:", dataSendtoTappay)
+
 			try: 
 				tappayResponse = requests.post(tappayServerUrl, json=dataSendtoTappay, headers=tappayHeaders)
 				status = tappayResponse.json()["status"]
@@ -721,9 +710,6 @@ def addOrder():
 			except Exception as e:
 				response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤, 付款失敗'},ensure_ascii=False)
 				return response_error500, 500 # 定義 http error code 500
-
-			
-						
 
 		else:
 			response_error403 = json.dumps({'error': True,'message': '未登入系統，拒絕存取'},ensure_ascii=False)
@@ -777,9 +763,6 @@ def getOrderData(orderNumber):
 		if existing_user and expiredTime > currentTime:
 			cursor.execute("""
         SELECT 
-            member_table.date, 
-            member_table.time, 
-            member_table.price, 
             attractions.id, 
             attractions.name, 
             attractions.address, 
@@ -788,47 +771,78 @@ def getOrderData(orderNumber):
             order_table.contactName, 
             order_table.contactEmail, 
             order_table.contactPhone, 
-            order_table.orderStatus 
+            order_table.orderStatus,
+			order_table.date,
+			order_table.time,	  
+			order_table.price
         FROM 
-            member_table 
-        LEFT JOIN 
-            attractions ON member_table.attractionId = attractions.id 
-        LEFT JOIN 
-            order_table ON member_table.id = order_table.member_id 
+    		order_table 
+		INNER JOIN 
+    		attractions ON  attractions.id = order_table.attractionId
+		INNER JOIN 
+			member_table on member_table.id = order_table.member_id
         WHERE 
             member_table.id = %s 
             AND member_table.email = %s 
             AND member_table.name = %s
-    """, (id, email, name))
+			AND order_table.orderNumber = %s	  
+    """, (id, email, name, orderNumber))
 
-			# cursor.execute("SELECT orderNumber from order_table WHERE member_id = %s", (id,))
 			queryData = cursor.fetchone()
 			print(queryData)
 
+			try:
 
-			# response_success = json.dumps({
-			# 								"data": {
-			# 									"number": queryOrderNumber,
-			# 									"price": 2000,
-			# 									"trip": {
-			# 									"attraction": {
-			# 										"id": 10,
-			# 										"name": "平安鐘",
-			# 										"address": "臺北市大安區忠孝東路 4 段",
-			# 										"image": "https://yourdomain.com/images/attraction/10.jpg"
-			# 									},
-			# 									"date": "2022-01-31",
-			# 									"time": "afternoon"
-			# 									},
-			# 									"contact": {
-			# 									"name": "彭彭彭",
-			# 									"email": "ply@ply.com",
-			# 									"phone": "0912345678"
-			# 									},
-			# 									"status": 1
-			# 								}
-			# 		},ensure_ascii=False)
-			return "ok"
+				if queryData:
+						
+					attractionId = queryData[0]
+					attractionName = queryData[1]
+					address = queryData[2]
+					image = json.loads(queryData[3])
+
+					number = queryData[4]
+					contactName = queryData[5]
+					contactEmail = queryData[6]
+					contactPhone = queryData[7]
+					status = queryData[8]
+					date = queryData[9]
+					time = queryData[10]
+					price = queryData[11]
+
+
+					response_success = json.dumps(
+						{
+						"data": {
+							"number": number,
+							"price": price,
+							"trip": {
+							"attraction": {
+								"id": attractionId,
+								"name": attractionName,
+								"address": address,
+								"image": image[0]
+							},
+							"date": date.strftime('%Y-%m-%d'),
+							"time": time
+							},
+							"contact": {
+							"name": contactName,
+							"email": contactEmail,
+							"phone": contactPhone
+							},
+							"status": status
+						}
+						},
+						ensure_ascii=False)
+					return response_success, 200
+				else:
+					response_error400 = json.dumps({'error': True,'message': '訂單號碼錯誤'},ensure_ascii=False)
+					return response_error400, 400 # 定義 http code 400
+			
+			except Exception as e:
+				response_error500 = json.dumps({'error': True,'message': '伺服器內部錯誤'},ensure_ascii=False)
+				return response_error500, 500 # 定義 http error code 500	
+			
 	finally:
 		if con.is_connected():
 			cursor.close()

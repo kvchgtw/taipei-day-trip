@@ -1,7 +1,4 @@
-let bookingEntry = document.getElementById("booking-entry-button")
 
-//booking 登入計數器，若用戶點擊預定行程而啟動登入彈窗，由此判斷是否重定向至booking 
-let bookingSignInEvent = 0
 
 //取資料
 let welcomeTitleName = document.getElementById("welcome-title-name")
@@ -22,6 +19,7 @@ let bookingSpotName = ""
 let bookingaddress = ""
 let date = ""
 let time = ""
+let displayTime = ''
 let price = ''
 
 //自動帶入用戶姓名與email
@@ -50,12 +48,7 @@ let footerStyle = document.getElementById("bottom-element")
 let deleteButton = document.querySelector(".delete-button")
 
 
-bookingEntry.addEventListener('click', function(){
-    bookingCheckSignIn()
-    if (bookingSignInEvent == 0){
-        bookingSignInEvent = bookingSignInEvent+1
-    }
-})
+
 
 
 function bookingCheckSignIn(){
@@ -133,9 +126,9 @@ function getBookingData_render(){
         date = data.data.date
         time = data.data.time
         if (time=="morning"){
-        time = "上午 9 點至下午 4 點"
+        displayTime = "上午 9 點至下午 4 點"
         }else if(time=="afternoon"){
-        time = "下午 3 點至晚上 9 點"
+        displayTime = "下午 3 點至晚上 9 點"
         }
         price = data.data.price
 
@@ -146,7 +139,7 @@ function getBookingData_render(){
 
         bookingSpotNameText.textContent=bookingSpotName
         bookingDate.textContent = date
-        bookingTime.textContent = time
+        bookingTime.textContent = displayTime
         bookingPrice.textContent = price
         totalPrice.textContent = price
         bookingAddressText.textContent = bookingaddress

@@ -1,4 +1,5 @@
 let apiOrderUrl = "/api/orders"
+// let orderData = {}
 
 TPDirect.setupSDK(137381, 'app_lAEQcuIT7wCTBrUjoHveDTWj7vAfHETbaAYoKCzfTe5QyC75a9ingpkJ97JD', 'sandbox')
 
@@ -77,7 +78,7 @@ let bookingContactEmail = document.getElementById("booking-contact-email")
 let bookingContactPhone = document.getElementById("booking-contact-phone")
 
 
-confirmOrderBtn.addEventListener("click", function(event){;
+confirmOrderBtn.addEventListener("click", function(event){
 
     event.preventDefault()
     
@@ -89,54 +90,77 @@ confirmOrderBtn.addEventListener("click", function(event){;
         return
     }
 
-    // Get prime
-    TPDirect.card.getPrime(function (result) {
-        if (result.status !== 0) {
-            alert('get prime error ' + result.msg)
-            return
+    async function getPrimeAsync() {
+        return new Promise((resolve, reject) => {
+            TPDirect.card.getPrime(function (result) {
+                if (result.status !== 0) {
+                    reject('get prime error ' + result.msg);
+                } else {
+                    resolve(result.card.prime);
+                }
+            });
+        });
+    }
+    
+    async function sendPrimeData() {
+        try {
+            const prime = await getPrimeAsync();
+    
+            const orderData = {
+                "prime": prime,
+                "order": {
+                    "price": price,
+                    "trip": {
+                        "attraction": {
+                            "id": bookingAttractionId,
+                            "name": bookingSpotName,
+                            "address": bookingaddress,
+                            "image": bookingimageUrl
+                        },
+                        "date": date,
+                        "time": time
+                    },
+                    "contact": {
+                        "name": bookingContactName.value,
+                        "email": bookingContactEmail.value,
+                        "phone": bookingContactPhone.value
+                    }
+                }
+            };
+    
+            console.log("orderData", orderData);
+    
+            const response = await fetch(apiOrderUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ` + window.localStorage.getItem("token"),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            });
+    
+            const paymentData = await response.json();
+            console.log(paymentData.data.number);
+
+            // let orderNumber = paymentData.data.number
+            // console.log("order number:", orderNumber)
+    
+            // 在這裡可以處理伺服器的回應
+            
+
+
+            // location.href = "/thankyou";
+            deleteBooking();
+        } catch (error) {
+            console.error(error);
         }
-        // alert('get prime 成功，prime: ' + result.card.prime)
-        prime = result.card.prime
-    })
+    }
+    
+    // 呼叫主函數
+    sendPrimeData();
+    
 
-
-    let orderData = {
-        "prime": prime,
-        "order": {
-            "price": price,
-            "trip": {
-            "attraction": {
-                "id": bookingAttractionId,
-                "name": bookingSpotName,
-                "address": bookingaddress,
-                "image": bookingimageUrl
-            },
-            "date": date,
-            "time": time
-            },
-            "contact": {
-            "name": bookingContactName.value,
-            "email": bookingContactEmail.value,
-            "phone": bookingContactPhone.value
-            }
-        }
-        }
-
-
-
-    fetch(apiOrderUrl, {
-        method: 'POST',
-        headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token"), 'Content-Type': 'application/json'},
-        body: JSON.stringify(orderData)
-        })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data)
-        location.href = "/thankyou"
-        deleteBooking()
-
-        
-    })   
+    
 })
         
 function deleteBooking(){
@@ -147,4 +171,4 @@ function deleteBooking(){
     .then(response => response.json())
     
 }
-     
+
