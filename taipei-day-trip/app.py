@@ -586,7 +586,7 @@ def deleteBooking():
 		if existing_user and expiredTime > currentTime:
 			# 不論會員是否已有行程資料，都直接覆蓋。
 			# 刪除掉訂單相關紀錄
-			cursor.execute("UPDATE member_table SET attractionId = NULL, date = NULL, time = NULL, price = NULL, contactName = NULL, contactEmail = NULL, contactPhone = NULL, orderNumber = NULL, orderStatus = NULL WHERE id = %s", (id,))
+			cursor.execute("UPDATE member_table SET attractionId = NULL, date = NULL, time = NULL, price = NULL WHERE id = %s", (id,))
 			con.commit() #確定執行
 
 			response_success = json.dumps({'ok': True},ensure_ascii=False)
