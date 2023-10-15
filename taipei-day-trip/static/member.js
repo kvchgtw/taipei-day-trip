@@ -1,3 +1,8 @@
+
+//booking 登入計數器，若用戶點擊預定行程而啟動登入彈窗，由此判斷是否重定向至booking 
+let bookingEntry = document.getElementById("booking-entry-button")
+let bookingSignInEvent = 0
+
 let signInButton = document.getElementById("sign-in-button")
 let mask = document.getElementById("mask")
 let signInDialog = document.getElementById("sign-in-dialog")
@@ -162,8 +167,11 @@ function checkSignIn(config={}){
         }else if (data == null && location.pathname == '/booking'){
             location.href = "/"
             
+        }else if (data == null && location.pathname == '/thankyou'){
+            location.href = "/"
             
         }
+
     })
     }
 }
@@ -245,3 +253,9 @@ signUpSubmitButton.addEventListener('click', function(){
 })
     
 
+bookingEntry.addEventListener('click', function(){
+    bookingCheckSignIn()
+    if (bookingSignInEvent == 0){
+        bookingSignInEvent = bookingSignInEvent+1
+    }
+})

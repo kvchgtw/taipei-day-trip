@@ -1,7 +1,4 @@
-let bookingEntry = document.getElementById("booking-entry-button")
 
-//booking 登入計數器，若用戶點擊預定行程而啟動登入彈窗，由此判斷是否重定向至booking 
-let bookingSignInEvent = 0
 
 //取資料
 let welcomeTitleName = document.getElementById("welcome-title-name")
@@ -14,6 +11,16 @@ let bookingPrice = document.getElementById("booking-spot-price")
 let bookingAddressText = document.getElementById("booking-spot-address")
 let bookingSpotImageContainer = document.getElementById("booking-spot-image")
 let totalPrice = document.getElementById("total-price")
+
+//全域宣告 for order data 
+let bookingAttractionId = ''
+let bookingimageUrl = ""
+let bookingSpotName = ""
+let bookingaddress = ""
+let date = ""
+let time = ""
+let displayTime = ''
+let price = ''
 
 //自動帶入用戶姓名與email
 
@@ -41,12 +48,7 @@ let footerStyle = document.getElementById("bottom-element")
 let deleteButton = document.querySelector(".delete-button")
 
 
-bookingEntry.addEventListener('click', function(){
-    bookingCheckSignIn()
-    if (bookingSignInEvent == 0){
-        bookingSignInEvent = bookingSignInEvent+1
-    }
-})
+
 
 
 function bookingCheckSignIn(){
@@ -116,18 +118,19 @@ function getBookingData_render(){
     .then(data => {
        
         if (data.data !== null){
-
-        let bookingimageUrl = data.data.attraction.image
-        let bookingSpotName = data.data.attraction.name
-        let bookingaddress = data.data.attraction.address
-        let date = data.data.date
-        let time = data.data.time
+        
+        bookingAttractionId = data.data.attraction.id
+        bookingimageUrl = data.data.attraction.image
+        bookingSpotName = data.data.attraction.name
+        bookingaddress = data.data.attraction.address
+        date = data.data.date
+        time = data.data.time
         if (time=="morning"){
-        time = "上午 9 點至下午 4 點"
+        displayTime = "上午 9 點至下午 4 點"
         }else if(time=="afternoon"){
-        time = "下午 3 點至晚上 9 點"
+        displayTime = "下午 3 點至晚上 9 點"
         }
-        let price = data.data.price
+        price = data.data.price
 
         let img = document.createElement("img")
         img.src = bookingimageUrl
@@ -136,12 +139,19 @@ function getBookingData_render(){
 
         bookingSpotNameText.textContent=bookingSpotName
         bookingDate.textContent = date
-        bookingTime.textContent = time
+        bookingTime.textContent = displayTime
         bookingPrice.textContent = price
         totalPrice.textContent = price
         bookingAddressText.textContent = bookingaddress
 
     }else if(data.data==null){
+        fetch(apiBookingUrl, {
+            method: 'DELETE',
+            headers: {'Authorization': `Bearer `+ window.localStorage.getItem("token")},
+            })
+        .then(response => response.json())
+        
+        
         bookingInfoArea.innerHTML = ""
         bookingContactArea.innerHTML = ""
         bookingCreditCardArea.innerHTML = ""
