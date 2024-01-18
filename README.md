@@ -16,7 +16,7 @@ Taipei Day Trip is an e-commerce site built with JavaScript, HTML, CSS, Python F
 - Integrated [TapPay](https://docs.tappaysdk.com/tutorial/zh/home.html) Payment API to support credit card transactions
 
 
-![RWD Screeshot](https://github.com/kvchgtw/taipei-day-trip/assets/138418959/f4918cc2-7b17-4d69-b12a-3a65c0d0fd73)
+![RWD Screeshot](https://github.com/kvchgtw/taipei-day-trip/assets/138418959/7d26c4dc-ddb2-40f2-9b87-71f77d2ba75e)
 
 
 ### Demo
