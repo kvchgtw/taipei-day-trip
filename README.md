@@ -4,7 +4,7 @@
 
 ### What is the Taipei Day Trip website?
 
-Taipei Day Trip is an e-commerce site built with JavaScript, HTML, CSS, Python Flask, MySQL, [TapPay](https://docs.tappaysdk.com/tutorial/zh/home.html) credit card payment API. The website is deployed on AWS EC2. This website allows users to navigate trip spots around Taipei MRT station.
+Taipei Day Trip is an e-commerce site built with `JavaScript`, `HTML`, `CSS`, `Python Flask`, `MySQL`, [TapPay](https://docs.tappaysdk.com/tutorial/zh/home.html) credit card payment API. The website is deployed on `AWS EC2`. This website allows users to navigate trip spots around Taipei MRT station.
 
 ### Highlights
 - Used HTML, CSS & JavaScript to develop front-end layout
@@ -33,21 +33,20 @@ You can use this test account to play around it:
 
 ## Technique Overview
 - #### Front-end
-  - HTML
-  - CSS
-  - JavaScript
+  - `HTML`
+  - `CSS`
+  - `JavaScript`
 - #### Back-end
-  - Python Flask
-  - RESTful API
-  - MySQL
-  - AWS EC2
-  - JWT
+  - `Python Flask`
+  - `RESTful API`
+  - `MySQL`
+  - `AWS EC2`
+  - `JWT`
 - #### Credit Card Payment API
-  - TapPay
+  - `TapPay`
 - #### Dev Tools
-  - Git
-  - GitHub
-
+  - `Git`
+  - `GitHub`
 
 
 ## Contact
